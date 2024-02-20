@@ -1,9 +1,9 @@
-# \<Project Name\> Scrum Team
+# Group 12 Scrum Team
 ## Product Owner
-\<Team Member Name\>
+Abheek Ranjan Das
 ## Scrum Master
-\<Team Member Name\>
+Aravinda Reddy Gangalakunta 
 ## Developers
-- \<Team Member Name\>
-- \<Team Member Name\>
-- \<Team Member Name\>
+- Gokul Reddy Devarapalli
+- Ramgopal Hyndav Bollepalli
+- Danny Bylla
