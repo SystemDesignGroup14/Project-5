@@ -2,3 +2,7 @@
   height: 60;
   justify-content: 'center';
 }
+.appbar{
+  display: flex;
+  justify-content: space-between;
+}
