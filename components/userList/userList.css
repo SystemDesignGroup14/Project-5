@@ -1,0 +1,38 @@
+.usersLayout {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #e0e0e0; /* Light grey border */
+  border-radius: 8px; /* Slightly rounded corners for the container */
+  background-color: #ffffff; /* White background */
+}
+
+.listTitle {
+  color: #333; /* Dark grey color for the text */
+  margin-bottom: 20px; /* Space below the title */
+}
+
+.userLink {
+  text-decoration: none; /* Remove underline from links */
+  color: #1976d2; /* MUI primary blue for link text */
+  font-weight: bold; /* Make the name text slightly bolder */
+}
+
+.ListItem {
+  padding: 10px 0; /* Adds some padding above and below each list item */
+}
+
+.Divider {
+  margin: 10px 0; /* Space above and below the divider */
+}
+
+.contentArea {
+  margin-top: 20px; /* Space above the content area */
+}
+
+@media (max-width: 768px) {
+  .usersLayout {
+    flex-direction: column;
+  }
+}
