@@ -1,0 +1,43 @@
+.box-first{
+    margin-top: 20px;
+}
+
+.box{
+    margin-top: 20px;
+    border: 1px solid #1f76df;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #078187; 
+    border-radius: 8px; 
+    transition: background-color 0.3s ease; 
+}
+
+.box:hover {
+    background-color: rgb(235, 233, 233); /* Color on hover */
+  }
+
+.heading{
+    display: flex;
+    flex-direction: column;
+    margin: 100px;
+    padding: 5px;
+    border-bottom: 2px solid #878787;
+    width: 15%;
+    color: #115887;
+}
+
+.description{
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    padding: 7px;
+    border: 0px;
+    padding-top: 15px;
+    color: #5e8711;
+}
+
+  
