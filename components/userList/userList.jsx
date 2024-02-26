@@ -1,47 +1,63 @@
-import React from 'react';
-import {
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-}
-from '@mui/material';
+import React, { Component } from 'react';
+import { Typography, List, ListItem, Divider, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 import './userList.css';
+import FetchModel from '../../lib/fetchModelData'; // Import the FetchModel function
 
-/**
- * Define UserList, a React component of project #5
- */
-class UserList extends React.Component {
+class UserList extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      users: [],
+    };
   }
+
+  componentDidMount() {
+    this.fetchUserList();
+  }
+
+  fetchUserList() {
+    
+    FetchModel('/user/list')
+      .then((response) => {
+        this.setState({ users: response.data });
+        console.log('User list:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching user list:', error);
+      });
+  }
+
+  renderUserList() {
+    return this.state.users.map(user => (
+      <div key={user._id}> 
+        <ListItem>
+          <Button
+            component={Link}
+            to={`/users/${user._id}`} 
+            className="userLink" 
+          >
+            {user.first_name}
+          </Button>
+        </ListItem>
+        <Divider />
+      </div>
+    ));
+  }
+  
 
   render() {
     return (
       <div>
-        <Typography variant="body1">
-          This is the user list, which takes up 3/12 of the window.
-          You might choose to use <a href="https://mui.com/components/lists/">Lists</a> and <a href="https://mui.com/components/dividers/">Dividers</a> to
-          display your users like so:
+      <div className="usersLayout">
+        <Typography variant="h6" className="listTitle">
+          User's Photos
         </Typography>
-        <List component="nav">
-          <ListItem>
-            <ListItemText primary="Item #1" />
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText primary="Item #2" />
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText primary="Item #3" />
-          </ListItem>
-          <Divider />
+        <List>
+          {this.renderUserList()}
         </List>
-        <Typography variant="body1">
-          The model comes in from window.models.userListModel()
-        </Typography>
+       
+      </div>
       </div>
     );
   }
