@@ -1,23 +1,20 @@
-/* Style User Details button */
+
 .ButtonLink {
   margin-bottom: 20px; 
 }
 
-/* Styles for User Photos header */
 .UserPhotosHeader {
   display: block;
   font-size: 24px; 
   margin-bottom: 10px; 
 }
 
-/* Styles for Date Taken captions */
 .DateTaken {
   display: block;
-  font-size: 14px; /* Decrease font size */
-  color: #666; /* Change text color */
+  font-size: 14px; 
+  color: #666; 
 }
 
-/* Styles for User Photo Box */
 .UserPhotoBox {
   border: 2px solid #3498db;
   border-radius: 5px;
@@ -45,7 +42,6 @@
   margin-bottom: 10px;
 }
 
-/* Loading text styles */
 .LoadingText {
   font-style: italic;
   color: #7f8c8d;
