@@ -28,7 +28,7 @@ class UserDetail extends React.Component {
       .then((response) => {
         this.setState({
           user: response.data,
-          selectedUser: "User Details: "+response.data.first_name 
+          selectedUser: "Details of: "+response.data.first_name +" " + response.data.last_name
         });
       })
       .catch((error) => console.error('There is an error:', error));
