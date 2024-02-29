@@ -31,11 +31,11 @@ function UserPhotos({ match }) {
     }
   };
 
-  const topNameValue = user ? `User photos for ${user.first_name} ${user.last_name}` : '';
+  const topNameValue = user ? `photos of ${user.first_name} ${user.last_name}` : '';
 
   return (
     <div>
-      <TopBar topName={topNameValue} />
+      <TopBar currentpageLabelOnTopBar={topNameValue} />
 
       <Button
         component={Link}
