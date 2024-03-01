@@ -16,12 +16,10 @@
 }
 
 .UserPhotoBox {
-  border: 2px solid #3498db;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-  background-color: #f5f5f5;
+  padding: 5px;
+  margin-bottom: 5px;
 }
+
 
 .UserPhotoTitle {
   font-weight: bold;
@@ -45,4 +43,11 @@
 .LoadingText {
   font-style: italic;
   color: #7f8c8d;
+}
+.photo-comment-container {
+  border: 2px solid #3498db;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 20px; 
+  background-color: #f5f5f5;
 }
