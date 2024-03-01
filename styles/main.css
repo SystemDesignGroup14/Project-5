@@ -1,15 +1,20 @@
-/*
-CSS for the project #5 main page
 
-Since CSS uses a global name space for classes we should use class names starting with
-main- here.
-*/
 
+/* Adjust the top bar buffer for smaller screens */
 .main-topbar-buffer {
   margin-top: 70px;
 }
 
+/* Allows the grid item to grow dynamically according to its content */
 .main-grid-item {
-  height: calc(100vh - 85px);
   padding: 10px;
+  overflow: hidden; /*  prevents content from overflowing */
+}
+
+@media (max-width: 600px) {
+  
+  /* Stack the user list and details/photos on smaller screens */
+  .Grid {
+    flex-direction: column;
+  }
 }
