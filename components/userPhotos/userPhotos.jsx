@@ -1,119 +1,123 @@
-import React, { useEffect, useState } from 'react';
+import React, { Component } from 'react';
 import { Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userPhotos.css';
 import TopBar from '../topBar/TopBar';
 import FetchModel from '../../lib/fetchModelData';
 
-function UserPhotos({ match }) {
-  const [photos, setPhotos] = useState([]);
-  const [user, setUser] = useState(null);
-  const [comment, setComment] = useState(null);
+class UserPhotos extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      photos: [],
+      user: null,
+      comment: null,
+    };
+  }
 
-  useEffect(() => {
-    fetchUserPhotosAndDetails();
-  }, [match.params.userId]);
+  componentDidMount() {
+    this.fetchUserPhotosAndDetails();
+  }
 
-  const fetchUserPhotosAndDetails = async () => {
-    const { userId } = match.params;
+  componentDidUpdate(prevProps) {
+    const { userId } = this.props.match.params;
+    if (prevProps.match.params.userId !== userId) {
+      this.fetchUserPhotosAndDetails();
+    }
+  }
+
+  fetchUserPhotosAndDetails = async () => {
+    const { userId } = this.props.match.params;
 
     try {
       const photosResponse = await FetchModel(`/photosOfUser/${userId}`);
-      setPhotos(photosResponse.data);
+      this.setState({ photos: photosResponse.data });
 
       const userDetailsResponse = await FetchModel(`/user/${userId}`);
-      const userDetails = userDetailsResponse.data;
-
-      setUser(userDetails);
-      setComment(userDetails ? userDetails.comment : null);
+      if (userDetailsResponse.data) {
+        const userDetails = userDetailsResponse.data;
+        this.setState({
+          user: userDetails,
+          comment: userDetails.comment,
+        });
+      }
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
-  const topNameValue = user ? `photos of ${user.first_name} ${user.last_name}` : '';
+  renderPhotos = () => {
+    return this.state.photos.map((photo) => (
+      <div key={photo._id} className="photo-comment-container"> {/* New wrapper */}
+        <img
+          src={`/images/${photo.file_name}`}
+          alt={`User ${this.props.match.params.userId}'s Photo`}
+          className="photo-image"
+        />
+        {photo.comments && photo.comments.length > 0 && this.renderComments(photo.comments)}
+      </div>
+    ));
+  };
+  
 
-  return (
-    <div>
-      <TopBar currentpageLabelOnTopBar={topNameValue} />
-
-      <Button
-        component={Link}
-        to={`/users/${match.params.userId}`}
-        variant="contained"
-        className="ButtonLink"
-      >
-        User Details
-      </Button>
-
-      <Typography variant="h4" className="UserPhotosHeader">
-        User Photos
-      </Typography>
-
-      <div className="photo-list">
-        {photos.map((photo) => (
-          <div key={photo._id} className="photo-item">
-            <img
-              src={`/images/${photo.file_name}`}
-              alt={`User ${match.params.userId}'s Photo`}
-              className="photo-image"
-            />
-
-            <div className="user-photo-box" style={{ marginTop: '16px' }}>
-              <Typography variant="caption" className="user-photo-title">
-                Date Taken
-              </Typography>
-
-              <Typography variant="body1" className="user-photo-value">
-                {photo.date_time}
-              </Typography>
-            </div>
-
-            {photo.comments && photo.comments.length > 0 && (
-              <div>
-                <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
-
-                {photo.comments.map((comment) => (
-                  <div key={comment._id} className="user-photo-box" style={{ marginTop: '16px' }}>
-                    <p>{comment.comment}</p>
-                    <p>
-                      <b>Commented ON:</b> {comment.date_time}
-                    </p>
-                    <p>
-                      <b>Commented BY:</b>
-                      <Link to={`/users/${comment.user._id}`}>
-                        {comment.user.first_name} {comment.user.last_name}
-                      </Link>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+  renderComments = (comments) => {
+    return (
+      <div>
+        <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
+        {comments.map((comment) => (
+          <div key={comment._id} className="user-photo-box" style={{ marginTop: '16px' }}>
+            <p>{comment.comment}</p>
+            <p>
+              <b>Commented ON:</b> {comment.date_time}
+            </p>
+            <p>
+              <b>Commented BY:</b>
+              <Link to={`/users/${comment.user._id}`}>
+                {comment.user.first_name} {comment.user.last_name}
+              </Link>
+            </p>
           </div>
         ))}
       </div>
+    );
+  };
 
-      {user ? (
-        <div>
-          {comment && (
-            <div className="user-photo-box" style={{ marginTop: '16px' }}>
-              <Typography variant="caption" className="user-photo-title">
-                Comment
-              </Typography>
+  render() {
+    const { user, comment } = this.state;
+    const topNameValue = user ? `photos of ${user.first_name} ${user.last_name}` : '';
 
-              <Typography variant="body1" className="user-photo-value">
-                {comment}
-              </Typography>
-            </div>
-          )}
-        </div>
-      ) : (
-        <Typography variant="body1" className="user-detail-box loading-text">
-          Loading user details...
+    return (
+      <div>
+        <TopBar currentpageLabelOnTopBar={topNameValue} />
+
+        <Button
+          component={Link}
+          to={`/users/${this.props.match.params.userId}`}
+          variant="contained"
+          className="ButtonLink"
+        >
+          User Details
+        </Button>
+
+        <Typography variant="h4" className="UserPhotosHeader">
+          User Photos
         </Typography>
-      )}
-    </div>
-  );
+
+        <div className="photo-list">{this.renderPhotos()}</div>
+
+        {user && comment && (
+          <div className="user-photo-box" style={{ marginTop: '16px' }}>
+            <Typography variant="caption" className="user-photo-title">
+              Comment
+            </Typography>
+            <Typography variant="body1" className="user-photo-value">
+              {comment}
+            </Typography>
+          </div>
+        )}
+      </div>
+    );
+  }
 }
 
 export default UserPhotos;
