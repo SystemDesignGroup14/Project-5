@@ -3,7 +3,6 @@ import { Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userDetail.css';
 import FetchModel from '../../lib/fetchModelData';
-import TopBar from '../topBar/TopBar';
 
 class UserDetail extends React.Component {
 
@@ -11,7 +10,6 @@ class UserDetail extends React.Component {
     super(props);
     this.state = {
       user: null,
-      selectedUser: ''
     };
   }
 
@@ -39,7 +37,7 @@ class UserDetail extends React.Component {
       .catch((error) => console.error('There is an error:', error));
   };
 
-  renderDetail = (label, value) => (
+  static renderDetail = (label, value) => (
     <div className="box">
       <Typography variant="body1" className="heading">
         {label}
@@ -54,23 +52,23 @@ class UserDetail extends React.Component {
 
     return (
       <div>
-        {user ? (
+        {this.state.user ? (
           <div>
             <div>
               <Button
                 component={Link}
-                to={`/photos/${user._id}`}
+                to={`/photos/${this.state.user._id}`}
                 variant="contained"
                 color="primary"
               >
                 User Photos
               </Button>
             </div>
-            {this.renderDetail('First Name', user.first_name)}
-            {this.renderDetail('Last Name', user.last_name)}
-            {this.renderDetail('Location', user.location)}
-            {this.renderDetail('Description', user.description)}
-            {this.renderDetail('Occupation', user.occupation)}
+            {this.renderDetail('First Name', this.state.user.first_name)}
+            {this.renderDetail('Last Name', this.state.user.last_name)}
+            {this.renderDetail('Location', this.state.user.location)}
+            {this.renderDetail('Description', this.state.user.description)}
+            {this.renderDetail('Occupation', this.state.user.user.occupation)}
           </div>
         ) : (
           <Typography variant="body1" className="box">Loading user details...</Typography>
