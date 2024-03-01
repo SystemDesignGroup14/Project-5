@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography } from '@mui/material';
-import './TopBar.css';
-import FetchModel from '../../lib/fetchModelData';
+import React, { useState, useEffect } from "react";
+import { AppBar, Toolbar, Typography } from "@mui/material";
+import "./TopBar.css";
+import FetchModel from "../../lib/fetchModelData";
 
 function TopBar(props) {
   const [appVersion, setAppVersion] = useState(undefined);
@@ -12,7 +12,7 @@ function TopBar(props) {
         const response = await FetchModel("/test/info");
         setAppVersion(response.data);
       } catch (error) {
-        console.error('Error fetching app version:', error);
+        console.error("Error fetching app version:", error);
       }
     };
 
@@ -21,20 +21,23 @@ function TopBar(props) {
 
   return appVersion ? (
     <AppBar className="topbar-appBar" position="absolute">
-      <Toolbar className='topbar'>
+      <Toolbar className="topbar">
         <Typography variant="h5" color="inherit">
           SSDI Group 12
         </Typography>
         <Typography variant="h5" color="inherit">
-          {props.currentpageLabelOnTopBar ? props.currentpageLabelOnTopBar : " "}
+          {props.currentpageLabelOnTopBar
+            ? props.currentpageLabelOnTopBar
+            : " "}
         </Typography>
+
         <Typography variant="h5" component="div" color="inherit">
           Version: {appVersion.__v}
         </Typography>
       </Toolbar>
     </AppBar>
   ) : (
-    <div /> 
+    <div />
   );
 }
 

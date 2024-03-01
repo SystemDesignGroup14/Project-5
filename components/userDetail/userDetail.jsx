@@ -34,6 +34,7 @@ class UserDetail extends React.Component {
           user: response.data,
           selectedUser: "Details of: "+response.data.first_name +" " + response.data.last_name
         });
+        this.props.labelOnTopBar(this.state.selectedUser);
       })
       .catch((error) => console.error('There is an error:', error));
   };
@@ -50,11 +51,9 @@ class UserDetail extends React.Component {
   );
 
   render() {
-    const { user, selectedUser } = this.state;
 
     return (
       <div>
-        <TopBar currentpageLabelOnTopBar={selectedUser} />
         {user ? (
           <div>
             <div>
