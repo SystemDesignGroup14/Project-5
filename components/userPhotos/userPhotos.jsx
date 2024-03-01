@@ -40,6 +40,7 @@ class UserPhotos extends Component {
           user: userDetails,
           comment: userDetails.comment,
         });
+        this.props.labelOnTopBar(`Photos of: ${userDetails.first_name} ${userDetails.last_name}`);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -84,12 +85,9 @@ class UserPhotos extends Component {
 
   render() {
     const { user, comment } = this.state;
-    const topNameValue = user ? `photos of ${user.first_name} ${user.last_name}` : '';
 
     return (
       <div>
-        <TopBar currentpageLabelOnTopBar={topNameValue} />
-
         <Button
           component={Link}
           to={`/users/${this.props.match.params.userId}`}
