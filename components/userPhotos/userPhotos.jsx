@@ -4,7 +4,45 @@ import { Link } from 'react-router-dom';
 import './userPhotos.css';
 import FetchModel from '../../lib/fetchModelData';
 
+
+const renderComments = (comments) => {
+  return (
+    <div>
+      <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
+      {comments.map((comment) => (
+        <div key={comment._id} className="user-photo-box" style={{ marginTop: '16px' }}>
+          <p>{comment.comment}</p>
+          <p>
+            <b>Commented ON:</b> {comment.date_time}
+          </p>
+          <p>
+            <b>Commented BY:</b>
+            <Link to={`/users/${comment.user._id}`}>
+              {comment.user.first_name} {comment.user.last_name}
+            </Link>
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+
+const renderPhotos = (photos, renderCommentsCallback) => {
+  return photos.map((photo) => (
+    <div key={photo._id} className="photo-comment-container">
+      <img
+        src={`/images/${photo.file_name}`}
+        alt={`User's pic is not available`}
+        className="photo-image"
+      />
+      {photo.comments && photo.comments.length > 0 && renderCommentsCallback(photo.comments)}
+    </div>
+  ));
+};
+
 class UserPhotos extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -46,44 +84,8 @@ class UserPhotos extends Component {
     }
   };
 
-  renderPhotos = () => {
-    return this.state.photos.map((photo) => (
-      <div key={photo._id} className="photo-comment-container"> {/* New wrapper */}
-        <img
-          src={`/images/${photo.file_name}`}
-          alt={`User ${this.props.match.params.userId}'s pic is not available`}
-          className="photo-image"
-        />
-        {photo.comments && photo.comments.length > 0 && this.renderComments(photo.comments)}
-      </div>
-    ));
-  };
-  
-
-  renderComments = (comments) => {
-    return (
-      <div>
-        <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
-        {comments.map((comment) => (
-          <div key={comment._id} className="user-photo-box" style={{ marginTop: '16px' }}>
-            <p>{comment.comment}</p>
-            <p>
-              <b>Commented ON:</b> {comment.date_time}
-            </p>
-            <p>
-              <b>Commented BY:</b>
-              <Link to={`/users/${comment.user._id}`}>
-                {comment.user.first_name} {comment.user.last_name}
-              </Link>
-            </p>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   render() {
-    const { user, comment } = this.state;
+    const { user, comment, photos } = this.state;
 
     return (
       <div>
@@ -100,7 +102,7 @@ class UserPhotos extends Component {
           User Photos
         </Typography>
 
-        <div className="photo-list">{this.renderPhotos()}</div>
+        <div className="photo-list">{renderPhotos(photos, renderComments)}</div>
 
         {user && comment && (
           <div className="user-photo-box" style={{ marginTop: '16px' }}>

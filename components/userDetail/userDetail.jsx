@@ -4,8 +4,19 @@ import { Link } from 'react-router-dom';
 import './userDetail.css';
 import FetchModel from '../../lib/fetchModelData';
 
-class UserDetail extends React.Component {
 
+const renderDetail = (label, value) => (
+  <div className="box">
+    <Typography variant="body1" className="heading">
+      {label}
+    </Typography>
+    <Typography variant="body1" className="description">
+      {value}
+    </Typography>
+  </div>
+);
+
+class UserDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,45 +41,34 @@ class UserDetail extends React.Component {
       .then((response) => {
         this.setState({
           user: response.data,
-          selectedUser: "Details of: "+response.data.first_name +" " + response.data.last_name
+          selectedUser: `Details of: ${response.data.first_name} ${response.data.last_name}`,
         });
+        
         this.props.labelOnTopBar(this.state.selectedUser);
       })
       .catch((error) => console.error('There is an error:', error));
   };
 
-   renderDetail = (label, value) => (
-    <div className="box">
-      <Typography variant="body1" className="heading">
-        {label}
-      </Typography>
-      <Typography variant="body1" className="description">
-        {value}
-      </Typography>
-    </div>
-  );
-
   render() {
+    const { user } = this.state;
 
     return (
       <div>
-        {this.state.user ? (
+        {user ? (
           <div>
-            <div>
-              <Button
-                component={Link}
-                to={`/photos/${this.state.user._id}`}
-                variant="contained"
-                color="primary"
-              >
-                User Photos
-              </Button>
-            </div>
-            {this.renderDetail('First Name', this.state.user.first_name)}
-            {this.renderDetail('Last Name', this.state.user.last_name)}
-            {this.renderDetail('Location', this.state.user.location)}
-            {this.renderDetail('Description', this.state.user.description)}
-            {this.renderDetail('Occupation', this.state.user.occupation)}
+            <Button
+              component={Link}
+              to={`/photos/${user._id}`}
+              variant="contained"
+              color="primary"
+            >
+              User Photos
+            </Button>
+            {renderDetail('First Name', user.first_name)}
+            {renderDetail('Last Name', user.last_name)}
+            {renderDetail('Location', user.location)}
+            {renderDetail('Description', user.description)}
+            {renderDetail('Occupation', user.occupation)}
           </div>
         ) : (
           <Typography variant="body1" className="box">Loading user details...</Typography>
