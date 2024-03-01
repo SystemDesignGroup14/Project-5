@@ -17,6 +17,14 @@ import UserPhotos from './components/userPhotos/userPhotos';
 class PhotoShare extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      labelOnTopBar: undefined
+    };
+    this.changeLabelOnTopBar = this.changeLabelOnTopBar.bind(this);
+  }
+
+  changeLabelOnTopBar = (label) => {
+    this.setState({labelOnTopBar: label});
   }
 
   render() {
@@ -25,7 +33,7 @@ class PhotoShare extends React.Component {
       <div>
       <Grid container spacing={8}>
         <Grid item xs={12}>
-          <TopBar/>
+          <TopBar currentpageLabelOnTopBar={this.state.labelOnTopBar}/>
         </Grid>
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>
@@ -39,20 +47,15 @@ class PhotoShare extends React.Component {
             <Route exact path="/"
                 render={() => (
                 <Typography variant="body1">
-                  Welcome to your photosharing app! This <a href="https://mui.com/components/paper/">Paper</a> component
-                  displays the main content of the application. The {"sm={9}"} prop in
-                  the <a href="https://mui.com/components/grid/">Grid</a> item component makes it responsively
-                  display 9/12 of the window. The Switch component enables us to conditionally render different
-                  components to this part of the screen. You don&apos;t need to display anything here on the homepage,
-                  so you should delete this Route component once you get started.
+                  Welcome to your photosharing app!
                 </Typography>
                 )}
               />
               <Route path="/users/:userId"
-                render={ props => <UserDetail {...props} /> }
+                render={ props => <UserDetail {...props} labelOnTopBar={this.changeLabelOnTopBar} />  }
               />
               <Route path="/photos/:userId"
-                render ={ props => <UserPhotos {...props} /> }
+                render ={ props => <UserPhotos {...props} labelOnTopBar={this.changeLabelOnTopBar}/> }
               />
               <Route path="/users" component={UserList}  />
             </Switch>
