@@ -51,7 +51,7 @@ class UserList extends Component {
       <div>
       <div className="usersLayout">
         <Typography variant="h6" className="listTitle">
-          User's Photos
+          Users
         </Typography>
         <List>
           {this.renderUserList()}

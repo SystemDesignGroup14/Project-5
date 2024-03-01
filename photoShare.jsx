@@ -25,7 +25,7 @@ class PhotoShare extends React.Component {
 
   changeLabelOnTopBar = (label) => {
     this.setState({labelOnTopBar: label});
-  }
+  };
 
   render() {
     return (

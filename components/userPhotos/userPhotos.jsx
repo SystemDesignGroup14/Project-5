@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userPhotos.css';
-import TopBar from '../topBar/TopBar';
 import FetchModel from '../../lib/fetchModelData';
 
 class UserPhotos extends Component {
@@ -52,7 +51,7 @@ class UserPhotos extends Component {
       <div key={photo._id} className="photo-comment-container"> {/* New wrapper */}
         <img
           src={`/images/${photo.file_name}`}
-          alt={`User ${this.props.match.params.userId}'s Photo`}
+          alt={`User ${this.props.match.params.userId}'s pic is not available`}
           className="photo-image"
         />
         {photo.comments && photo.comments.length > 0 && this.renderComments(photo.comments)}
@@ -61,7 +60,7 @@ class UserPhotos extends Component {
   };
   
 
-  renderComments = (comments) => {
+  static renderComments = (comments) => {
     return (
       <div>
         <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
