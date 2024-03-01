@@ -6,10 +6,14 @@ import FetchModel from '../../lib/fetchModelData';
 import TopBar from '../topBar/TopBar';
 
 class UserDetail extends React.Component {
-  state = {
-    user: null,
-    selectedUser: '',
-  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: null,
+      selectedUser: ''
+    };
+  }
 
   componentDidMount() {
     this.getUserDetails();
