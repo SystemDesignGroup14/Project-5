@@ -60,7 +60,7 @@ class UserPhotos extends Component {
   };
   
 
-  static renderComments = (comments) => {
+  renderComments = (comments) => {
     return (
       <div>
         <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>

@@ -37,7 +37,7 @@ class UserDetail extends React.Component {
       .catch((error) => console.error('There is an error:', error));
   };
 
-  static renderDetail = (label, value) => (
+   renderDetail = (label, value) => (
     <div className="box">
       <Typography variant="body1" className="heading">
         {label}
@@ -68,7 +68,7 @@ class UserDetail extends React.Component {
             {this.renderDetail('Last Name', this.state.user.last_name)}
             {this.renderDetail('Location', this.state.user.location)}
             {this.renderDetail('Description', this.state.user.description)}
-            {this.renderDetail('Occupation', this.state.user.user.occupation)}
+            {this.renderDetail('Occupation', this.state.user.occupation)}
           </div>
         ) : (
           <Typography variant="body1" className="box">Loading user details...</Typography>
