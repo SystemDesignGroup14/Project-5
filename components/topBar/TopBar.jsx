@@ -32,7 +32,7 @@ function TopBar(props) {
         </Typography>
 
         <Typography variant="h5" component="div" color="inherit">
-          Version: {appVersion.__v}
+          Version: {appVersion.version}
         </Typography>
       </Toolbar>
     </AppBar>
