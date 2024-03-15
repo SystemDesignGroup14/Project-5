@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Typography, List, ListItem, Divider, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userList.css';
-import FetchModel from '../../lib/fetchModelData'; // Import the FetchModel function
-
+import axios from "axios";
 class UserList extends Component {
   constructor(props) {
     super(props);
@@ -18,7 +17,7 @@ class UserList extends Component {
 
   fetchUserList() {
     
-    FetchModel('/user/list')
+    axios.get('/user/list')
       .then((response) => {
         this.setState({ users: response.data });
         console.log('User list:', response.data);
