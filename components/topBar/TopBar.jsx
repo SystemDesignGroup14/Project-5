@@ -9,7 +9,7 @@ function TopBar(props) {
   useEffect(() => {
     const fetchAppVersion = async () => {
       try {
-        const response = await FetchModel("/test/info");
+        const response = await axios.get("/test/info");
         setAppVersion(response.data);
       } catch (error) {
         console.error("Error fetching app version:", error);
