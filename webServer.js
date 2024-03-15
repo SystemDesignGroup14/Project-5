@@ -178,19 +178,19 @@ app.get("/user/list", function (request, response) {
 // });
 app.get("/user/:id", function (request, response) {
   const userId = request.params.id;
-  User.findById(userId, function (err, user) {
-    if (err) {
-      console.error("Error fetching user:", err);
-      response.status(500).send("Internal Server Error");
-      return;
-    }
-    if (!user) {
-      console.log("User with _id:" + userId + " not found.");
-      response.status(404).send("User not found");
-      return;
-    }
-    response.status(200).json(user);
-  });
+
+  User.findById(userId)
+       .select('-__v')
+      .then(user => {
+          if (!user) {
+              return response.status(400).send("User not found");
+          }
+          response.status(200).json(user);
+      })
+      .catch(err => {
+          console.error("Error fetching user:", err);
+          response.status(500).send("Internal Server Error");
+      });
 });
 
 
