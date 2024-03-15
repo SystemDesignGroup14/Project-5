@@ -46,7 +46,6 @@ const SchemaInfo = require("./schema/schemaInfo.js");
 
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
-const models = require("./modelData/photoApp.js").models;
 mongoose.set("strictQuery", false);
 mongoose.connect("mongodb://root:example@127.0.0.1:27017/project6?authSource=admin", {
   useNewUrlParser: true,
@@ -153,7 +152,7 @@ app.get("/test/:p1", function (request, response) {
 //   response.status(200).send(models.userListModel());
 // });
 app.get("/user/list", function (request, response) {
-  User.find({}, function (err, users) {
+  User.find({},'_id first_name last_name', function (err, users) {
     if (err) {
       console.error("Error fetching users:", err);
       response.status(500).send("Internal Server Error");
@@ -212,57 +211,48 @@ app.get("/user/:id", function (request, response) {
 //This is requests mongo for fetching data
 
 app.get('/photosOfUser/:id', async function (request, response) {
-  // Begin by extracting the user ID from the URL parameters.
   const userId = request.params.id;
-  
-  // First, verify the existence of the user associated with the provided ID.
-  const userExists = await User.findById(userId);
-  if (!userExists) {
-    // If no matching user is found, inform the requester with a 404 Not Found response.
-    return response.status(404).send("User not found");
-  }
 
-  // Proceed to retrieve all photos uploaded by the identified user.
-  Photo.find({ user_id: userId })
-    .lean() // Optimize by converting Mongoose documents into plain JavaScript objects for more straightforward manipulation.
-    .exec(async function (err, photos) {
-      if (err) {
-        // Log and report any issues encountered during the photo retrieval process.
-        console.error("Encountered an error fetching photos:", err);
-        return response.status(500).send("Internal Server Error");
-      }
-      
-      if (photos.length === 0) {
-        // Notify the requester if the specified user has no associated photos.
-        return response.status(404).send("Photos not found");
-      }
+  try {
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      response.status(404).send("User not found");
+      return;
+    }
 
-      try {
-        // Iterate through each photo to enhance comment details.
-        for (let photo of photos) {
-          if (photo.comments) {
-            for (let comment of photo.comments) {
-              // Fetch and append commenter details for each comment, replacing generic user IDs with specific user information.
-              const commentingUser = await User.findById(comment.user_id);
-              if (commentingUser) {
-                // Update the comment structure to include the commenter's full details.
-                comment.user = commentingUser;
-              }
-              // Remove the user_id field from comments to streamline the response and focus on relevant details.
-              delete comment.user_id;
-            }
-          }
+    const photos = await Photo.find({ user_id: userId }).lean();
+    if (photos.length === 0) {
+      response.status(404).send("Photos not found");
+      return;
+    }
+
+    // to run them in parallel
+    const photosWithComments = await Promise.all(photos.map(async (photo) => {
+      const commentsWithUser = await Promise.all(photo.comments.map(async (comment) => {
+        const user = await User.findById(comment.user_id, '_id first_name last_name').lean();
+        if (user) {
+          comment.user = {
+            _id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name
+          };
         }
+        delete comment.user_id;
+        return comment;
+      }));
 
-        // After processing, return the enriched set of photos and comments.
-        response.status(200).json(photos);
-      } catch (error) {
-        // Should processing fail, log the error and provide an appropriate server response.
-        console.error("A processing error occurred with photos:", error);
-        response.status(500).send("Internal Server Error");
-      }
-    });
+      photo.comments = commentsWithUser;
+      return photo;
+    }));
+
+    response.status(200).json(photosWithComments);
+  } catch (error) {
+    console.error("Error processing request:", error);
+    response.status(500).send("Internal Server Error");
+  }
 });
+
+
 
 
 
