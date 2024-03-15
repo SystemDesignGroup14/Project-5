@@ -2,8 +2,7 @@ import React from 'react';
 import { Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userDetail.css';
-import FetchModel from '../../lib/fetchModelData';
-
+import axios from 'axios';
 
 const renderDetail = (label, value) => (
   <div className="box">
@@ -37,7 +36,7 @@ class UserDetail extends React.Component {
 
   getUserDetails = () => {
     const { userId } = this.props.match.params;
-    FetchModel(`/user/${userId}`)
+    axios.get(`/user/${userId}`)
       .then((response) => {
         this.setState({
           user: response.data,

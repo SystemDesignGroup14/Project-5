@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 import "./TopBar.css";
-import FetchModel from "../../lib/fetchModelData";
+import axios from "axios";
 
 function TopBar(props) {
   const [appVersion, setAppVersion] = useState(undefined);

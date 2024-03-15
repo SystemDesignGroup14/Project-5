@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Typography, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userPhotos.css';
-import FetchModel from '../../lib/fetchModelData';
-
+import axios from 'axios';
 
 const renderComments = (comments) => {
   return (
@@ -67,10 +66,10 @@ class UserPhotos extends Component {
     const { userId } = this.props.match.params;
 
     try {
-      const photosResponse = await FetchModel(`/photosOfUser/${userId}`);
+      const photosResponse = await axios.get(`/photosOfUser/${userId}`);
       this.setState({ photos: photosResponse.data });
 
-      const userDetailsResponse = await FetchModel(`/user/${userId}`);
+      const userDetailsResponse = await axios.get(`/user/${userId}`);
       if (userDetailsResponse.data) {
         const userDetails = userDetailsResponse.data;
         this.setState({
