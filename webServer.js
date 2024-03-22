@@ -32,17 +32,24 @@
  */
 
 const mongoose = require("mongoose");
-mongoose.Promise = require("bluebird");
-
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const multer = require("multer");
 const async = require("async");
-
 const express = require("express");
+
+
+
 const app = express();
+app.use(session({ secret: "secretKey", resave: false, saveUninitialized: false }));
+app.use(bodyParser.json());
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
 const Photo = require("./schema/photo.js");
 const SchemaInfo = require("./schema/schemaInfo.js");
+
+mongoose.Promise = require("bluebird");
 
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
