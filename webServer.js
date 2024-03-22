@@ -155,9 +155,6 @@ app.get("/test/:p1", function (request, response) {
 /**
  * URL /user/list - Returns all the User objects.
  */
-// app.get("/user/list", function (request, response) {
-//   response.status(200).send(models.userListModel());
-// });
 app.get("/user/list", function (request, response) {
   User.find({},'_id first_name last_name', function (err, users) {
     if (err) {
@@ -173,16 +170,6 @@ app.get("/user/list", function (request, response) {
 /**
  * URL /user/:id - Returns the information for User (id).
  */
-// app.get("/user/:id", function (request, response) {
-//   const id = request.params.id;
-//   const user = models.userModel(id);
-//   if (user === null) {
-//     console.log("User with _id:" + id + " not found.");
-//     response.status(400).send("Not found");
-//     return;
-//   }
-//   response.status(200).send(user);
-// });
 app.get("/user/:id", function (request, response) {
   const userId = request.params.id;
 
@@ -201,22 +188,9 @@ app.get("/user/:id", function (request, response) {
 });
 
 
-// /**
-//  * URL /photosOfUser/:id - Returns the Photos for User (id).
-//  */
-// app.get("/photosOfUser/:id", function (request, response) {
-//   const id = request.params.id;
-//   const photos = models.photoOfUserModel(id);
-//   if (photos.length === 0) {
-//     console.log("Photos for user with _id:" + id + " not found.");
-//     response.status(400).send("Not found");
-//     return;
-//   }
-//   response.status(200).send(photos);
-// });
-
-//This is requests mongo for fetching data
-
+/**
+ * URL /photosOfUser/:id - Returns the Photos for User (id).
+ */
 app.get('/photosOfUser/:id', async function (request, response) {
   const userId = request.params.id;
 
@@ -259,6 +233,43 @@ app.get('/photosOfUser/:id', async function (request, response) {
   }
 });
 
+
+app.post("/admin/login", async function (request, response) {
+  const { login_name } = request.body;
+
+  try {
+    if (!login_name) {
+      return response.status(400).send("Username is required");
+    }
+
+    const user = await User.findOne({ login_name: login_name});
+    if (!user) {
+      return response.status(404).send("User does not exist");
+    }
+
+    request.session.user = user;
+    response.status(200).send("Login successful");
+  } catch (error) {
+    console.error("Error during login:", error);
+    response.status(500).send("Internal Server Error");
+  }
+
+});
+
+app.post("/admin/logout", function (request, response) {
+  if (request.session) {
+      request.session.destroy(err => {
+          if (err) {
+              console.error("Logout error:", err);
+              response.status(500).send("Error logging out");
+          } else {
+              response.status(200).send("Logout successful");
+          }
+      });
+  } else {
+      response.status(400).send("Not logged in");
+  }
+});
 
 
 
