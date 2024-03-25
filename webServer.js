@@ -66,6 +66,15 @@ db.once('open', function() {
   console.log("We're connected to the database!");
 });
 
+// Session check middleware
+const checkSession = (req, res, next) => {
+  if (!req.session.userId) {
+      // Instead of redirecting, send a 401 status code
+      return res.status(401).send('Unauthorized - No active session found');
+  }
+  next();
+};
+
 // We have the express static module
 // (http://expressjs.com/en/starter/static-files.html) do all the work for us.
 app.use(express.static(__dirname));
@@ -155,7 +164,7 @@ app.get("/test/:p1", function (request, response) {
 /**
  * URL /user/list - Returns all the User objects.
  */
-app.get("/user/list", function (request, response) {
+app.get("/user/list",checkSession ,function (request, response) {
   User.find({},'_id first_name last_name', function (err, users) {
     if (err) {
       console.error("Error fetching users:", err);
@@ -170,7 +179,7 @@ app.get("/user/list", function (request, response) {
 /**
  * URL /user/:id - Returns the information for User (id).
  */
-app.get("/user/:id", function (request, response) {
+app.get("/user/:id",checkSession, function (request, response) {
   const userId = request.params.id;
 
   User.findById(userId)
@@ -191,7 +200,7 @@ app.get("/user/:id", function (request, response) {
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
-app.get('/photosOfUser/:id', async function (request, response) {
+app.get('/photosOfUser/:id', checkSession,async function (request, response) {
   const userId = request.params.id;
 
   try {
@@ -234,6 +243,8 @@ app.get('/photosOfUser/:id', async function (request, response) {
 });
 
 
+
+
 app.post("/admin/login", async function (request, response) {
   const { login_name } = request.body;
 
@@ -247,7 +258,8 @@ app.post("/admin/login", async function (request, response) {
       return response.status(404).send("User does not exist");
     }
 
-    request.session.user = user;
+     request.session.userId = user._id;
+
     response.status(200).send("Login successful");
   } catch (error) {
     console.error("Error during login:", error);
