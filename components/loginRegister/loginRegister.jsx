@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
-import {Typography, TextField, Button, Box } from '@mui/material';
+import { Typography, TextField, Button, Box } from '@mui/material';
 import './LoginRegister.css';
 import axios from 'axios';
 
-function LoginRegister({ toggleLogin }) {
+function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
   const [loginName, setLoginName] = useState('');
   const [loginError, setLoginError] = useState('');
 
@@ -13,26 +13,31 @@ function LoginRegister({ toggleLogin }) {
 
     try {
       const response = await axios.post("/admin/login", { login_name: loginName });
-      console.log(response);
-      toggleLogin(true); // Call toggleLogin with true upon successful login
+      console.log(response.data);
+      if (response.data) {
+        toggleLogin(true);
+        changeCurrentLoggedInUser(`${response.data.first_name} ${response.data.last_name}`);
+      } else {
+        toggleLogin(false);
+        setLoginError('Login failed, please try again.');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Login error:', error);
+      toggleLogin(false);
       setLoginError('Failed to login, please check your username');
     }
   };
 
   useEffect(() => {
-    const sessionCookie = Cookies.get('connect.sid'); // The name 'connect.sid' is default for express-session
+    const sessionCookie = Cookies.get('connect.sid');
     if (sessionCookie) {
-      toggleLogin(true); // Use toggleLogin to set login status
+      toggleLogin(true);
     }
   }, [toggleLogin]);
 
   return (
     <Box className="loginRegister" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Login
-      </Typography>
+      <Typography variant="h4" component="h1" gutterBottom>Login</Typography>
       <Box component="form" onSubmit={handleLogin} width="100%" maxWidth={360}>
         <TextField
           fullWidth

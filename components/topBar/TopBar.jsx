@@ -22,9 +22,21 @@ function TopBar(props) {
   return appVersion ? (
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar className="topbar">
+        {/* <Typography variant="h5" color="inherit">
+          SSDI Group 12
+        </Typography> */}
         <Typography variant="h5" color="inherit">
           SSDI Group 12
+          {props.currentLoggedInUser ? (
+            <div style={{ color: "lightgreen" }}>
+              {" "}
+              Hi {props.currentLoggedInUser}{" "}
+            </div>
+          ) : (
+            " Please Login"
+          )}
         </Typography>
+
         <Typography variant="h5" color="inherit">
           {props.currentpageLabelOnTopBar
             ? props.currentpageLabelOnTopBar
