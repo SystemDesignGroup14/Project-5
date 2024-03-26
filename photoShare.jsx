@@ -15,14 +15,19 @@ class PhotoShare extends React.Component {
     super(props);
     this.state = {
       labelOnTopBar: undefined,
-      isLoggedIn: false
+      isLoggedIn: false,
+      currentLoggedInUser: undefined,
     };
     this.changeLabelOnTopBar = this.changeLabelOnTopBar.bind(this);
+    this.changeCurrentLoggedInUser = this.changeCurrentLoggedInUser.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
   }
 
   changeLabelOnTopBar(label) {
     this.setState({ labelOnTopBar: label });
+  }
+  changeCurrentLoggedInUser(username){
+    this.setState({currentLoggedInUser:username});
   }
 
   toggleLogin(isLoggedIn) {
@@ -35,7 +40,7 @@ class PhotoShare extends React.Component {
         <div>
           <Grid container spacing={8}>
             <Grid item xs={12}>
-              <TopBar currentpageLabelOnTopBar={this.state.labelOnTopBar}/>
+              <TopBar currentpageLabelOnTopBar={this.state.labelOnTopBar} currentLoggedInUser={this.state.currentLoggedInUser}/>
             </Grid>
             <div className="main-topbar-buffer"/>
             {this.state.isLoggedIn && (
@@ -66,7 +71,7 @@ class PhotoShare extends React.Component {
                   <Route path="/admin/login" render={props => (
                     this.state.isLoggedIn ? 
                       <Redirect to="/" />
-                      : <LoginRegister {...props} toggleLogin={this.toggleLogin} />
+                      : <LoginRegister {...props} toggleLogin={this.toggleLogin} changeCurrentLoggedInUser={this.changeCurrentLoggedInUser} />
                   )} />
                 </Switch>
               </Paper>

@@ -260,7 +260,7 @@ app.post("/admin/login", async function (request, response) {
 
      request.session.userId = user._id;
 
-    response.status(200).send("Login successful");
+    response.status(200).send(user);
   } catch (error) {
     console.error("Error during login:", error);
     response.status(500).send("Internal Server Error");
