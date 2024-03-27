@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
 
-function TopBar(props) {
+function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout }) {
   const [appVersion, setAppVersion] = useState(undefined);
 
   useEffect(() => {
@@ -18,6 +18,8 @@ function TopBar(props) {
 
     fetchAppVersion();
   }, []); // Empty dependency array means this runs once after initial render
+  
+  
 
   return appVersion ? (
     <AppBar className="topbar-appBar" position="absolute">
@@ -27,10 +29,10 @@ function TopBar(props) {
         </Typography> */}
         <Typography variant="h5" color="inherit">
           SSDI Group 12
-          {props.currentLoggedInUser ? (
+          {currentLoggedInUser ? (
             <div style={{ color: "lightgreen" }}>
               {" "}
-              Hi {props.currentLoggedInUser}{" "}
+              Hi {currentLoggedInUser}{" "}
             </div>
           ) : (
             " Please Login"
@@ -38,14 +40,18 @@ function TopBar(props) {
         </Typography>
 
         <Typography variant="h5" color="inherit">
-          {props.currentpageLabelOnTopBar
-            ? props.currentpageLabelOnTopBar
+          {currentpageLabelOnTopBar
+            ? currentpageLabelOnTopBar
             : " "}
         </Typography>
 
         <Typography variant="h5" component="div" color="inherit">
           Version: {appVersion.version}
         </Typography>
+        {currentLoggedInUser ? (
+        <Button variant="contained" onClick={handleLogout}>Logout</Button>
+        ):("")
+        }        
       </Toolbar>
     </AppBar>
   ) : (
