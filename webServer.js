@@ -179,29 +179,47 @@ app.get("/user/list",checkSession ,function (request, response) {
 /**
  * URL /user/:id - Returns the information for User (id).
  */
-app.get("/user/:id",checkSession, function (request, response) {
+app.get("/user/:id", checkSession, function (request, response) {
   const userId = request.params.id;
 
+  if (!mongoose.isValidObjectId(userId)) {
+    return response.status(400).send("Invalid user ID");
+  }
+
   User.findById(userId)
-       .select('-__v')
-      .then(user => {
-          if (!user) {
-              return response.status(400).send("User not found");
-          }
-          response.status(200).json(user);
-      })
-      .catch(err => {
-          console.error("Error fetching user:", err);
-          response.status(500).send("Internal Server Error");
-      });
+    .select('-__v')
+    .then(user => {
+      if (!user) {
+        return response.status(400).send("User not found");
+      }
+      const userResponse = {
+        _id: user._id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        location: user.location,
+        description: user.description,
+        occupation: user.occupation
+      };
+
+      response.status(200).json(userResponse);
+    })
+    .catch(err => {
+      console.error("Error fetching user:", err);
+      response.status(500).send("Internal Server Error");
+    });
 });
 
 
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
-app.get('/photosOfUser/:id', checkSession,async function (request, response) {
-  const userId = request.params.id;
+app.get('/photosOfUser/:id', checkSession, async function (req, response) {
+  const userId = req.params.id;
+
+  // Validate user ID 
+  if (!mongoose.isValidObjectId(userId)) {
+    return response.status(400).send("Invalid user ID");
+  }
 
   try {
     const userExists = await User.findById(userId);
@@ -211,31 +229,28 @@ app.get('/photosOfUser/:id', checkSession,async function (request, response) {
     }
 
     const photos = await Photo.find({ user_id: userId }).lean();
-    if (photos.length === 0) {
-      response.status(404).send("Photos not found");
-      return;
-    }
 
-    // to run them in parallel
-    const photosWithComments = await Promise.all(photos.map(async (photo) => {
-      const commentsWithUser = await Promise.all(photo.comments.map(async (comment) => {
-        const user = await User.findById(comment.user_id, '_id first_name last_name').lean();
+    
+    photos.forEach(photo => photo.comments = photo.comments || []);
+
+    // Fetch user details for each comment synchronously
+    for (const photo of photos) {
+      for (const comment of photo.comments) {
+        const user = await User.findById(comment.user_id, '_id first_name last_name');
         if (user) {
           comment.user = {
             _id: user._id,
             first_name: user.first_name,
             last_name: user.last_name
           };
+        } else {
+          comment.user = null; 
         }
         delete comment.user_id;
-        return comment;
-      }));
+      }
+    }
 
-      photo.comments = commentsWithUser;
-      return photo;
-    }));
-
-    response.status(200).json(photosWithComments);
+    response.status(200).json(photos);
   } catch (error) {
     console.error("Error processing request:", error);
     response.status(500).send("Internal Server Error");
