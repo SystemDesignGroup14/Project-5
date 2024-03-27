@@ -88,3 +88,4 @@ This endpoint demonstrates how we interact with MongoDB to fetch and return user
    - As a developer, I want to update the UserList component to fetch user list data from the server instead of using window.models.
 4. **Modify UserPhotos Component**
    - As a developer, I want to update the UserPhotos component to fetch user photos and comments data from the server instead of using window.models.
+# newdemo
