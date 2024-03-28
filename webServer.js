@@ -37,7 +37,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const async = require("async");
 const express = require("express");
-
+const path = require("path");
 
 
 const app = express();
@@ -82,6 +82,21 @@ app.use(express.static(__dirname));
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
 });
+
+// Configure multer for file storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '/images');
+    // console.log('Upload directory:', uploadDir);
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Use the original filename from the client-side
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
+
 
 /**
  * Use express to handle argument passing in the URL. This .get will cause
@@ -297,6 +312,30 @@ app.post("/admin/logout", function (request, response) {
       });
   } else {
       response.status(400).send("Not logged in");
+  }
+});
+
+
+
+// Upload photo endpoint
+app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded');
+  }
+
+  try {
+    const newPhoto = new Photo({
+      file_name: req.file.filename,
+      user_id: req.session.userId,
+      date_time: new Date(),
+      comments: []
+    });
+
+    await newPhoto.save();
+    res.status(200).send('Photo uploaded successfully');
+  } catch (error) {
+    console.error('Error uploading photo:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
