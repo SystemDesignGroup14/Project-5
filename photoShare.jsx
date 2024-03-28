@@ -9,6 +9,8 @@ import UserDetail from "./components/userDetail/userDetail";
 import UserList from "./components/userList/userList";
 import UserPhotos from "./components/userPhotos/userPhotos";
 import LoginRegister from "./components/loginRegister/loginRegister";
+import { Snackbar } from "@mui/material";
+
 
 class PhotoShare extends React.Component {
   constructor(props) {
@@ -39,12 +41,26 @@ class PhotoShare extends React.Component {
       .post("/admin/logout")
       .then(() => {
         console.log("Logout successful");
-        this.setState({ isLoggedIn: false, currentLoggedInUser: undefined });
+        this.setState({
+          isLoggedIn: false,
+          currentLoggedInUser: undefined,
+          snackbarOpen: true,
+          snackbarMessage: "Logout successful",
+        });
       })
       .catch((error) => {
         console.error("Logout error:", error);
+        this.setState({
+          snackbarOpen: true,
+          snackbarMessage: "Logout failed",
+        });
       });
   };
+  handleSnackbarClose = () => {
+    this.setState({ snackbarOpen: false });
+  };
+  
+  
 
   render() {
     return (
@@ -125,6 +141,12 @@ class PhotoShare extends React.Component {
               </Paper>
             </Grid>
           </Grid>
+          <Snackbar
+          open={this.state.snackbarOpen}
+          autoHideDuration={6000}
+          onClose={this.handleSnackbarClose}
+          message={this.state.snackbarMessage}
+        />
         </div>
       </HashRouter>
     );

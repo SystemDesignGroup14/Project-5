@@ -6,13 +6,14 @@ import axios from 'axios';
 
 function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
   const [loginName, setLoginName] = useState('');
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
   const handleLogin = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await axios.post("/admin/login", { login_name: loginName });
+      const response = await axios.post("/admin/login", { login_name: loginName, password: password });
       console.log(response.data);
       if (response.data) {
         toggleLogin(true);
@@ -24,7 +25,7 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
     } catch (error) {
       console.error('Login error:', error);
       toggleLogin(false);
-      setLoginError('Failed to login, please check your username');
+      setLoginError('Failed to login, please check your username and password.');
     }
   };
 
@@ -45,6 +46,15 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
           label="Username"
           value={loginName}
           onChange={(e) => setLoginName(e.target.value)}
+          margin="normal"
+        />
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           margin="normal"
         />
         <Button type="submit" variant="contained" color="primary" className="loginButton">

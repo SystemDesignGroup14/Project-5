@@ -261,20 +261,22 @@ app.get('/photosOfUser/:id', checkSession, async function (req, response) {
 
 
 app.post("/admin/login", async function (request, response) {
-  const { login_name } = request.body;
+  const { login_name,password } = request.body;
 
   try {
-    if (!login_name) {
-      return response.status(400).send("Username is required");
+    if (!login_name || !password) {
+      return response.status(400).send("Username and password is required");
     }
 
     const user = await User.findOne({ login_name: login_name});
     if (!user) {
-      return response.status(404).send("User does not exist");
+      return response.status(404).send("Username  does not exist");
     }
-
+    if (user.password !== password) {
+      return response.status(401).send("Incorrect password");
+    }
      request.session.userId = user._id;
-
+    
     response.status(200).send(user);
   } catch (error) {
     console.error("Error during login:", error);
