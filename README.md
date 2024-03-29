@@ -88,4 +88,21 @@ This endpoint demonstrates how we interact with MongoDB to fetch and return user
    - As a developer, I want to update the UserList component to fetch user list data from the server instead of using window.models.
 4. **Modify UserPhotos Component**
    - As a developer, I want to update the UserPhotos component to fetch user photos and comments data from the server instead of using window.models.
-# newdemo
+
+### Problem 3: Database integration and endpoint conversion
+1. **Integration with Database**
+   - As a developer, I want our application to fetch data from a MongoDB database instead of static files, ensuring dynamic content delivery.
+2. **Backend modifications handled successfully**
+   - As a developer, I want to ensure that our backend modifications handle database interactions.
+3. **Frontend integration with Axios**
+   - As a developer, I want the frontend to use Axios for HTTP requests for modularity and added functionalities.
+
+### Problem 5: User authentication and registration followed by photo commenting functionality
+1. **Login Functionality**
+   - As a developer, I want our application to have a robust user authentication system, enabling secure login and logout functionality to enhance user experience and security.
+2. **Commenting Functionality**
+   - As a developer, I want our application to include a commenting system, allowing users to engage with content by adding comments to photos.
+3. **Photo Upload Feature**
+   - As a developer, I want our application to support photo uploads, enabling users to share their photos and enhance community interaction.
+4. **Enhanced registration functionality**
+   - As a developer, I want to enhance our application's registration and login system, allowing for secure account creation and access management.
