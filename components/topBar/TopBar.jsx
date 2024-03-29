@@ -96,11 +96,11 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
                 />
               </>
             )}
-
+           { currentLoggedInUser &&
             <Typography variant="h5" color="inherit">
               {currentpageLabelOnTopBar || " "}
             </Typography>
-
+           }
             <Typography variant="h5" component="div" color="inherit">
               Version: {appVersion.version}
             </Typography>
