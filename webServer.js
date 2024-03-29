@@ -177,6 +177,74 @@ app.get("/test/:p1", function (request, response) {
 });
 
 /**
+ * URL /user - adds a new user
+ */
+app.post("/user", function (request, response) {
+  const first_name = request.body.first_name || "";
+  const last_name = request.body.last_name || "";
+  const location = request.body.location || "";
+  const description = request.body.description || "";
+  const occupation = request.body.occupation || "";
+  const login_name = request.body.login_name || "";
+  const password = request.body.password || "";
+
+  if (first_name === "") {
+    console.error("Error in /user", first_name);
+    response.status(400).send("first_name is required");
+    return;
+  }
+  if (last_name === "") {
+    console.error("Error in /user", last_name);
+    response.status(400).send("last_name is required");
+    return;
+  }
+  if (login_name === "") {
+    console.error("Error in /user", login_name);
+    response.status(400).send("login_name is required");
+    return;
+  }
+  if (password === "") {
+    console.error("Error in /user", password);
+    response.status(400).send("password is required");
+    return;
+  }
+
+  User.exists({login_name: login_name}, function (err, returnValue){
+    if (err){
+      console.error("Error in /user", err);
+      response.status(500).send();
+    } else if (returnValue) {
+        console.error("Error in /user", returnValue);
+        response.status(400).send();
+      } else {
+        User.create(
+            {
+              _id: new mongoose.Types.ObjectId(),
+              first_name: first_name,
+              last_name: last_name,
+              location: location,
+              description: description,
+              occupation: occupation,
+              login_name: login_name,
+              password: password
+            })
+            .then((user) => {
+              request.session.user_id = user._id;
+              session.user_id = user._id;
+              response.end(JSON.stringify(user));
+            })
+            .catch(err => {
+              console.error("Error in /user", err);
+              response.status(500).send();
+            });
+      }
+  });
+});
+
+
+
+
+/**
  * URL /user/list - Returns all the User objects.
  */
 app.get("/user/list",checkSession ,function (request, response) {
