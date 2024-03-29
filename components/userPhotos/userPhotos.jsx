@@ -134,7 +134,7 @@ class UserPhotos extends Component {
                 <div>
                   <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
                   {photo.comments.map((comment) => (
-                    <div key={comment._id} className="user-photo-box" style={{ marginTop: '16px' }}>
+                    <div key={comment._id} className="photo-comment-container" style={{ marginTop: '16px' }}>
                       <p>{comment.comment}</p>
                       <p>
                         <b>Commented ON:</b> {comment.date_time}
