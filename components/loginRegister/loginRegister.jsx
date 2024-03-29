@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Typography, TextField, Button, Box } from '@mui/material';
-import './LoginRegister.css';
-import axios from 'axios';
 import Cookies from 'js-cookie';
-
+import { Typography, TextField, Button, Box } from '@mui/material';
+import './loginRegister.css';
+import axios from 'axios';
 
 function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
   const [loginName, setLoginName] = useState('');
@@ -14,6 +13,7 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
   const [description, setDescription] = useState('');
   const [occupation, setOccupation] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [registrationError, setRegistrationError] = useState('');
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
 
@@ -37,9 +37,7 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
     }
   };
 
-  const handleRegister = async (event) => {
-    event.preventDefault();  // Prevent the form from being submitted normally
-
+  const handleRegister = async () => {
     try {
       const response = await axios.post("/user", {
         first_name: firstName,
@@ -51,13 +49,13 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
         occupation: occupation
       });
       console.log(response.data);
-      setRegistrationError('');
+      setRegistrationSuccess(true);
       setShowRegistrationForm(false); // Hide registration form after successful registration
-      setLoginError('Registration successful, please login.');
+      setLoginError('');
     } catch (error) {
       console.error('Registration error:', error);
-      // console.log(error.response.data);
-      setRegistrationError(error.response.data);
+      setRegistrationSuccess(false);
+      setRegistrationError('Failed to register, please try again.');
     }
   };
 
@@ -70,113 +68,116 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
 
   return (
     <Box className="loginRegister" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-      {!showRegistrationForm && (
-        <>
-          <Typography variant="h4" component="h1" gutterBottom>Login</Typography>
-          <Box component="form" onSubmit={handleLogin} width="100%" maxWidth={360}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Username"
-              value={loginName}
-              onChange={(e) => setLoginName(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary" className="loginButton">
-              Login
-            </Button>
-            {loginError && (
-              <Typography color="error" variant="body2">
-                {loginError}
-              </Typography>
-            )}
-          </Box>
-          <Button variant="contained" onClick={() => setShowRegistrationForm(true)}>
+      <Typography variant="h4" component="h1" gutterBottom>Login</Typography>
+      <Box component="form" onSubmit={handleLogin} width="100%" maxWidth={360}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Username"
+          value={loginName}
+          onChange={(e) => setLoginName(e.target.value)}
+          margin="normal"
+        />
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          margin="normal"
+        />
+        <Button type="submit" variant="contained" color="primary" className="loginButton">
+          Login
+        </Button>
+        {loginError && (
+          <Typography color="error" variant="body2">
+            {loginError}
+          </Typography>
+        )}
+      </Box>
+
+      {/* Display Registration Form if showRegistrationForm is true */}
+      {showRegistrationForm && (
+        <Box component="form" onSubmit={handleRegister} width="100%" maxWidth={360}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Occupation"
+            value={occupation}
+            onChange={(e) => setOccupation(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Username"
+            value={loginName}
+            onChange={(e) => setLoginName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
+          />
+          <Button type="submit" variant="contained" color="primary" className="registerButton">
             Register
           </Button>
-        </>
+          {registrationError && (
+            <Typography color="error" variant="body2">
+              {registrationError}
+            </Typography>
+          )}
+          {registrationSuccess && (
+            <Typography color="success" variant="body2">
+              Registration successful!
+            </Typography>
+          )}
+        </Box>
       )}
 
-      {showRegistrationForm && (
-        <>
-          <Typography variant="h4" component="h1" gutterBottom>Register</Typography>
-          <Box component="form" onSubmit={handleRegister} width="100%" maxWidth={360}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Occupation"
-              value={occupation}
-              onChange={(e) => setOccupation(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Username"
-              value={loginName}
-              onChange={(e) => setLoginName(e.target.value)}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary" className="registerButton">
-              Register
-            </Button>
-            {registrationError && (
-              <Typography color="error" variant="body2">
-                {registrationError}
-              </Typography>
-            )}
-          </Box>
-        </>
+      {/* Show Register Button if registration form is not displayed */}
+      {!showRegistrationForm && (
+        <Button variant="contained" onClick={() => setShowRegistrationForm(true)}>
+          Register
+        </Button>
       )}
     </Box>
   );
