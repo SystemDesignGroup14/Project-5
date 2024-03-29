@@ -400,6 +400,37 @@ app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req
 });
 
 
+app.post("/commentsOfPhoto/:photo_id", checkSession, async (req, res) => {
+  const { photo_id } = req.params;
+  const { comment } = req.body;
+  const userId = req.session.userId;
+
+  if (!comment) {
+    return res.status(400).send("Comment text is required");
+  }
+
+  try {
+    const photo = await Photo.findById(photo_id);
+    if (!photo) {
+      return res.status(404).send("Photo not found");
+    }
+
+    // Add the comment to the photo's comments array
+    photo.comments.push({
+      comment: comment,
+      date_time: new Date(),
+      user_id: userId
+    });
+
+    await photo.save();
+
+    res.status(200).send("Comment added successfully");
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 
 
 
