@@ -54,8 +54,9 @@ mongoose.Promise = require("bluebird");
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://root:example@127.0.0.1:27017/project6?authSource=admin", {
-  useNewUrlParser: true,
+mongoose.connect("mongodb://127.0.0.1/project6", {
+
+useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => console.log('MongoDB connected...'))
 .catch(err => console.error(err));
@@ -179,50 +180,66 @@ app.get("/test/:p1", function (request, response) {
 /**
  * URL /user - adds a new user
  */
-app.post("/user", async (request, response) => {
-  const { login_name, password, first_name, last_name, location, description, occupation } = request.body;
-
-  // Validate required fields
-  if (!login_name || !password || !first_name || !last_name) {
-    return response.status(400).send("Missing required fields.");
+app.post("/user", function (request, response) {
+  const first_name = request.body.first_name || "";
+  const last_name = request.body.last_name || "";
+  const location = request.body.location || "";
+  const description = request.body.description || "";
+  const occupation = request.body.occupation || "";
+  const login_name = request.body.login_name || "";
+  const password = request.body.password || "";
+  if (first_name === "") {
+    console.error("Error in /user", first_name);
+    response.status(400).send("first_name is required");
+    return;
+  }
+  if (last_name === "") {
+    console.error("Error in /user", last_name);
+    response.status(400).send("last_name is required");
+    return;
+  }
+  if (login_name === "") {
+    console.error("Error in /user", login_name);
+    response.status(400).send("login_name is required");
+    return;
+  }
+  if (password === "") {
+    console.error("Error in /user", password);
+    response.status(400).send("password is required");
+    return;
   }
 
-  try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ login_name });
-    if (existingUser) {
-      return response.status(400).send("User already exists with the given login name.");
-    }
-
-    // Create a new user
-    const newUser = new User({
-      first_name,
-      last_name,
-      location,
-      description,
-      occupation,
-      login_name,
-      password
-    });
-
-    const savedUser = await newUser.save();
-
-    //preparing response
-    const userResponse = {
-      ...savedUser.toObject(),
-      login_name: savedUser.login_name
-    };
-
-    // Exclude password and other sensitive data from the response
-    delete userResponse.password;
-
-    response.status(200).json(userResponse);
-  } catch (err) {
-    console.error("Error in /user", err);
-    response.status(500).send("Internal Server Error");
-  }
+  User.exists({login_name: login_name}, function (err, returnValue){
+    if (err){
+      console.error("Error in /user", err);
+      response.status(500).send();
+    } else if (returnValue) {
+        console.error("Error in /user", returnValue);
+        response.status(400).send();
+      } else {
+        User.create(
+            {
+              _id: new mongoose.Types.ObjectId(),
+              first_name: first_name,
+              last_name: last_name,
+              location: location,
+              description: description,
+              occupation: occupation,
+              login_name: login_name,
+              password: password
+            })
+            .then((user) => {
+              request.session.user_id = user._id;
+              session.user_id = user._id;
+              response.end(JSON.stringify(user));
+            })
+            .catch(err => {
+              console.error("Error in /user", err);
+              response.status(500).send();
+            });
+      }
+  });
 });
-
 
 
 
@@ -337,11 +354,9 @@ app.post("/admin/login", async function (request, response) {
     console.log("user:", user);
     if (!user) {
       return response.status(404).send("Username  does not exist");
-      console.log("11");
     }
     if (user.password !== password) {
       return response.status(401).send("Incorrect password");
-      console.log("12");
     }
      request.session.userId = user._id;
     
@@ -373,7 +388,7 @@ app.post("/admin/logout", function (request, response) {
 // Upload photo endpoint
 app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req, res) => {
   console.log("3");
-  let response;
+  //let response;
   if (!req.file) {
     return res.status(400).send('No file uploaded');
   }
