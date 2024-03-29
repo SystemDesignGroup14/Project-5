@@ -1,16 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
-import { Grid, Typography, Paper } from "@mui/material";
-import "./styles/main.css";
+import { Grid, Typography, Paper, Snackbar } from "@mui/material"; // Import Snackbar from MUI here
 import axios from "axios";
 import TopBar from "./components/topBar/TopBar";
 import UserDetail from "./components/userDetail/userDetail";
 import UserList from "./components/userList/userList";
 import UserPhotos from "./components/userPhotos/userPhotos";
 import LoginRegister from "./components/loginRegister/loginRegister";
-import { Snackbar } from "@mui/material";
-
 
 class PhotoShare extends React.Component {
   constructor(props) {
@@ -19,16 +16,20 @@ class PhotoShare extends React.Component {
       labelOnTopBar: undefined,
       isLoggedIn: false,
       currentLoggedInUser: undefined,
+      snackbarOpen: false, // Initialize snackbarOpen state
+      snackbarMessage: '', // Initialize snackbarMessage state
     };
     this.changeLabelOnTopBar = this.changeLabelOnTopBar.bind(this);
     this.changeCurrentLoggedInUser = this.changeCurrentLoggedInUser.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
+    this.handleSnackbarClose = this.handleSnackbarClose.bind(this); // Bind handleSnackbarClose
   }
 
   changeLabelOnTopBar(label) {
     this.setState({ labelOnTopBar: label });
   }
+
   changeCurrentLoggedInUser(username) {
     this.setState({ currentLoggedInUser: username });
   }
@@ -36,7 +37,8 @@ class PhotoShare extends React.Component {
   toggleLogin(isLoggedIn) {
     this.setState({ isLoggedIn });
   }
-  handleLogout = () => {
+
+  handleLogout() {
     axios
       .post("/admin/logout")
       .then(() => {
@@ -55,12 +57,11 @@ class PhotoShare extends React.Component {
           snackbarMessage: "Logout failed",
         });
       });
-  };
-  handleSnackbarClose = () => {
+  }
+
+  handleSnackbarClose() {
     this.setState({ snackbarOpen: false });
-  };
-  
-  
+  }
 
   render() {
     return (
@@ -96,57 +97,54 @@ class PhotoShare extends React.Component {
                   </Route>
                   <Route
                     path="/users/:userId"
-                    render={(props) =>
-                      this.state.isLoggedIn ? (
+                    render={ (props) =>{
+                      return this.state.isLoggedIn ? (
                         <UserDetail
                           {...props}
-                          labelOnTopBar={this.changeLabelOnTopBar}
-                        />
+                          labelOnTopBar={this.changeLabelOnTopBar} />
                       ) : (
                         <Redirect to="/admin/login" />
-                      )
-                    }
-                  />
+                      );
+                    }}
+                      />
                   <Route
                     path="/photos/:userId"
-                    render={(props) =>
-                      this.state.isLoggedIn ? (
-                        <UserPhotos
-                          {...props}
-                          labelOnTopBar={this.changeLabelOnTopBar}
-                        />
-                      ) : (
-                        <Redirect to="/admin/login" />
-                      )
-                    }
+                    render={ (props) =>
+                      {
+                        return this.state.isLoggedIn ? (
+                          <UserPhotos
+                            {...props}
+                            labelOnTopBar={this.changeLabelOnTopBar} />
+                        ) : (
+                          <Redirect to="/admin/login" />
+                        );
+                      }}
                   />
                   <Route
                     path="/admin/login"
                     render={(props) =>
-                      this.state.isLoggedIn ? (
-                        <Redirect to="/" />
-                      ) : (
-                        <LoginRegister
-                          {...props}
-                          toggleLogin={this.toggleLogin}
-                          changeCurrentLoggedInUser={
-                            this.changeCurrentLoggedInUser
-                          }
-                          handleLogout={this.handleLogout}
-                        />
-                      )
-                    }
+                      {
+                        return this.state.isLoggedIn ? (
+                          <Redirect to="/" />
+                        ) : (
+                          <LoginRegister
+                            {...props}
+                            toggleLogin={this.toggleLogin}
+                            changeCurrentLoggedInUser={this.changeCurrentLoggedInUser}
+                            handleLogout={this.handleLogout} />
+                        );
+                      }}
                   />
                 </Switch>
               </Paper>
             </Grid>
           </Grid>
           <Snackbar
-          open={this.state.snackbarOpen}
-          autoHideDuration={6000}
-          onClose={this.handleSnackbarClose}
-          message={this.state.snackbarMessage}
-        />
+            open={this.state.snackbarOpen}
+            autoHideDuration={6000}
+            onClose={this.handleSnackbarClose}
+            message={this.state.snackbarMessage}
+          />
         </div>
       </HashRouter>
     );
