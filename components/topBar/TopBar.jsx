@@ -54,8 +54,7 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
         console.log("Photo uploaded successfully:", response.data);
         setSnackbarMessage('Photo uploaded successfully!');
         setSnackbarOpen(true);
-        window.location.reload();
-        // history.push(window.location.pathname);
+        
       } catch (error) {
         console.error("Error uploading photo:", error);
         setSnackbarMessage('Error uploading photo');
