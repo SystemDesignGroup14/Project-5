@@ -54,7 +54,7 @@ mongoose.Promise = require("bluebird");
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://root:example@127.0.0.1:27017/project6?authSource=admin", {
+mongoose.connect("mongodb://127.0.0.1/project6", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => console.log('MongoDB connected...'))
@@ -282,13 +282,15 @@ app.post("/admin/login", async function (request, response) {
     if (!login_name || !password) {
       return response.status(400).send("Username and password is required");
     }
-
     const user = await User.findOne({ login_name: login_name});
+    console.log("user:", user);
     if (!user) {
       return response.status(404).send("Username  does not exist");
+      console.log("11");
     }
     if (user.password !== password) {
       return response.status(401).send("Incorrect password");
+      console.log("12");
     }
      request.session.userId = user._id;
     
@@ -319,10 +321,12 @@ app.post("/admin/logout", function (request, response) {
 
 // Upload photo endpoint
 app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req, res) => {
+  console.log("3");
+  let response;
   if (!req.file) {
     return res.status(400).send('No file uploaded');
   }
-
+  
   try {
     const newPhoto = new Photo({
       file_name: req.file.filename,
@@ -330,7 +334,12 @@ app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req
       date_time: new Date(),
       comments: []
     });
-
+    
+    // newPhoto.save().then((photo) => {
+      
+    //   res.status(200).send('ok');
+    //   console.log("4");
+    // });
     await newPhoto.save();
     res.status(200).send('Photo uploaded successfully');
   } catch (error) {

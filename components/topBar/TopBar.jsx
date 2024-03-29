@@ -3,12 +3,14 @@ import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import { useHistory } from "react-router-dom";
 
 function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout }) {
   const [appVersion, setAppVersion] = useState(undefined);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const fileInputRef = useRef(null);
+  const history = useHistory(); 
 
   useEffect(() => {
     const fetchAppVersion = async () => {
@@ -42,7 +44,7 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
       const filename = `${currentLoggedInUser}_${year}_${month}_${date}_${hour}_${minutes}_${seconds}_${milliseconds}.${fileExtension}`;
       const formData = new FormData();
       formData.append("uploadedphoto", file, filename);
-
+      let response;
       try {
          response = await axios.post("/photos/new", formData, {
           headers: {
@@ -52,6 +54,8 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
         console.log("Photo uploaded successfully:", response.data);
         setSnackbarMessage('Photo uploaded successfully!');
         setSnackbarOpen(true);
+        window.location.reload();
+        // history.push(window.location.pathname);
       } catch (error) {
         console.error("Error uploading photo:", error);
         setSnackbarMessage('Error uploading photo');

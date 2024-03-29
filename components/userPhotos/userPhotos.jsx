@@ -67,6 +67,7 @@ class UserPhotos extends Component {
 
     try {
       const photosResponse = await axios.get(`/photosOfUser/${userId}`);
+      console.log(photosResponse);
       this.setState({ photos: photosResponse.data });
 
       const userDetailsResponse = await axios.get(`/user/${userId}`);
