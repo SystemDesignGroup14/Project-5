@@ -54,7 +54,7 @@ mongoose.Promise = require("bluebird");
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1/project6", {
+mongoose.connect("mongodb://root:example@127.0.0.1:27017/project6?authSource=admin", {
 
 useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -73,7 +73,7 @@ const checkSession = (req, res, next) => {
       // Instead of redirecting, send a 401 status code
       return res.status(401).send('Unauthorized - No active session found');
   }
-  next();
+  return next();
 };
 
 // We have the express static module
@@ -233,8 +233,8 @@ app.post("/user", function (request, response) {
               session.user_id = user._id;
               response.end(JSON.stringify(user));
             })
-            .catch(err => {
-              console.error("Error in /user", err);
+            .catch(errr => {
+              console.error("Error in /user", errr);
               response.status(500).send();
             });
       }
@@ -290,55 +290,54 @@ app.get("/user/:id", checkSession, function (request, response) {
       console.error("Error fetching user:", err);
       response.status(500).send("Internal Server Error");
     });
+    // return;
 });
 
 
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
-app.get('/photosOfUser/:id', checkSession, async function (req, response) {
+app.get('/photosOfUser/:id', checkSession, async (req, response) => {
   const userId = req.params.id;
 
-  // Validate user ID 
   if (!mongoose.isValidObjectId(userId)) {
-    return response.status(400).send("Invalid user ID");
+      return response.status(400).send("Invalid user ID");
   }
 
   try {
-    const userExists = await User.findById(userId);
-    if (!userExists) {
-      response.status(404).send("User not found");
-      return;
-    }
-
-    const photos = await Photo.find({ user_id: userId }).lean();
-
-    
-    photos.forEach(photo => photo.comments = photo.comments || []);
-
-    // Fetch user details for each comment synchronously
-    for (const photo of photos) {
-      for (const comment of photo.comments) {
-        const user = await User.findById(comment.user_id, '_id first_name last_name');
-        if (user) {
-          comment.user = {
-            _id: user._id,
-            first_name: user.first_name,
-            last_name: user.last_name
-          };
-        } else {
-          comment.user = null; 
-        }
-        delete comment.user_id;
+      const userExists = await User.findById(userId);
+      if (!userExists) {
+          return response.status(404).send("User not found");
       }
-    }
 
-    response.status(200).json(photos);
+      const photos = await Photo.find({ user_id: userId }).lean();
+      photos.forEach(photo => {
+        photo.comments = photo.comments || [];
+    });
+    
+      // Refactored to use Promise.all()
+      const commentUserPromises = photos.map(photo => Promise.all(photo.comments.map(comment => User.findById(comment.user_id, '_id first_name last_name').then(user => {
+                  comment.user = {
+                      _id: user._id,
+                      first_name: user.first_name,
+                      last_name: user.last_name
+                  };
+                  delete comment.user_id;
+                  return comment;
+              })
+          ))
+      );
+
+      // Await all promises for user details in comments
+      await Promise.all(commentUserPromises);
+
+      return response.status(200).json(photos);
   } catch (error) {
-    console.error("Error processing request:", error);
-    response.status(500).send("Internal Server Error");
+      console.error("Error processing request:", error);
+      return response.status(500).send("Internal Server Error");
   }
 });
+
 
 
 
@@ -353,17 +352,17 @@ app.post("/admin/login", async function (request, response) {
     const user = await User.findOne({ login_name: login_name});
     console.log("user:", user);
     if (!user) {
-      return response.status(404).send("Username  does not exist");
+      return response.status(400).send("Username  does not exist");
     }
     if (user.password !== password) {
-      return response.status(401).send("Incorrect password");
+      return response.status(400).send("Incorrect password");
     }
      request.session.userId = user._id;
     
-    response.status(200).send(user);
+    return response.status(200).send(user);
   } catch (error) {
     console.error("Error during login:", error);
-    response.status(500).send("Internal Server Error");
+    return response.status(500).send("Internal Server Error");
   }
 
 });
@@ -407,10 +406,10 @@ app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req
     //   console.log("4");
     // });
     await newPhoto.save();
-    res.status(200).send('Photo uploaded successfully');
+    return res.status(200).send('Photo uploaded successfully');
   } catch (error) {
     console.error('Error uploading photo:', error);
-    res.status(500).send('Internal Server Error');
+    return res.status(500).send('Internal Server Error');
   }
 });
 
@@ -439,10 +438,10 @@ app.post("/commentsOfPhoto/:photo_id", checkSession, async (req, res) => {
 
     await photo.save();
 
-    res.status(200).send("Comment added successfully");
+    return res.status(200).send("Comment added successfully");
   } catch (error) {
     console.error("Error adding comment:", error);
-    res.status(500).send("Internal Server Error");
+    return res.status(500).send("Internal Server Error");
   }
 });
 
