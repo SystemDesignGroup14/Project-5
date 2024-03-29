@@ -40,7 +40,8 @@
     "react-dom": "^17.0.0",
     "react-router": "^5.1.12",
     "react-router-dom": "^5.1.12",
-    "url-loader": "^4.1.1"
+    "url-loader": "^4.1.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
