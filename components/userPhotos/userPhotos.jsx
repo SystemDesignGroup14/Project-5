@@ -3,7 +3,7 @@ import { Typography, Button, Dialog, DialogTitle, DialogContent, DialogContentTe
 import { Link } from 'react-router-dom';
 import './userPhotos.css';
 import axios from 'axios';
-import TopBar from '../topBar/TopBar';
+// import TopBar from '../topBar/TopBar';
 
 class UserPhotos extends Component {
   constructor(props) {
@@ -133,16 +133,16 @@ class UserPhotos extends Component {
               {photo.comments && photo.comments.length > 0 && (
                 <div>
                   <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
-                  {photo.comments.map((comment) => (
-                    <div key={comment._id} className="photo-comment-container" style={{ marginTop: '16px' }}>
-                      <p>{comment.comment}</p>
+                  {photo.comments.map((photoComment) => (
+                    <div key={photoComment._id} className="photo-comment-container" style={{ marginTop: '16px' }}>
+                      <p>{photoComment.comment}</p>
                       <p>
-                        <b>Commented ON:</b> {comment.date_time}
+                        <b>Commented ON:</b> {photoComment.date_time}
                       </p>
                       <p>
                         <b>Commented BY:</b>
-                        <Link to={`/users/${comment.user._id}`}>
-                          {comment.user.first_name} {comment.user.last_name}
+                        <Link to={`/users/${photoComment.user._id}`}>
+                          {photoComment.user.first_name} {photoComment.user.last_name}
                         </Link>
                       </p>
                     </div>
