@@ -2,15 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
-import { useHistory } from "react-router-dom";
+// Removed unused import
+// import { useHistory } from "react-router-dom";
+// Removed unused import
+// import { v4 as uuidv4 } from "uuid";
 
 function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout }) {
   const [appVersion, setAppVersion] = useState(undefined);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const fileInputRef = useRef(null);
-  const history = useHistory(); 
+  // Removed unused variable
+  // const history = useHistory(); 
 
   useEffect(() => {
     const fetchAppVersion = async () => {
@@ -54,7 +57,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
         console.log("Photo uploaded successfully:", response.data);
         setSnackbarMessage('Photo uploaded successfully!');
         setSnackbarOpen(true);
-        
       } catch (error) {
         console.error("Error uploading photo:", error);
         setSnackbarMessage('Error uploading photo');
@@ -96,11 +98,11 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
                 />
               </>
             )}
-           { currentLoggedInUser &&
+
             <Typography variant="h5" color="inherit">
               {currentpageLabelOnTopBar || " "}
             </Typography>
-           }
+
             <Typography variant="h5" component="div" color="inherit">
               Version: {appVersion.version}
             </Typography>
