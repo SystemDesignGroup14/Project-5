@@ -101,6 +101,42 @@ class UserPhotos extends Component {
     }
   }
 
+  async handleDeleteCommentById(commentId) {
+    console.log("Delete comment by id clicked", commentId);
+    try {
+      const body = { 'commentId': commentId };
+      await axios.delete("/deletecommentbyid", { data: body })
+        .then(response => {
+          console.log("Comment deleted successfully");
+          // Refetch user photos and details to update comments
+          this.fetchUserPhotosAndDetails();
+        })
+        .catch(error => {
+          console.error("Unable to delete comment by id: ", error);
+        });
+    } catch (error) {
+      console.error("Unable to delete comment by id: ", error);
+    }
+  }
+  
+  async handleDeletePhotoById(photoId) {
+    console.log("delete photo by id: ", photoId);
+    try {
+      const body = { 'photoId': photoId };
+      await axios.delete("/deletephotobyid", { data: body })
+        .then(response => {
+          console.log("Photo deleted successfully");
+          // Refetch user photos and details to update photos
+          this.fetchUserPhotosAndDetails();
+        })
+        .catch(error => {
+          console.error("Unable to delete photo by id: ", error);
+        });
+    } catch (error) {
+      console.error("Unable to delete photo by id: ", error);
+    }
+  }
+
   render() {
     const { user, comment, photos, addComment, newComment } = this.state;
     console.log("current logged in user: ",this.state.loggedInUserId);
@@ -132,7 +168,7 @@ class UserPhotos extends Component {
               />
              {/* Delete Photo Button */}
              {photo.user_id === this.state.loggedInUserId && (
-              <Button variant="contained" color="secondary">
+              <Button variant="contained" color="secondary" onClick={()=> this.handleDeletePhotoById(photo._id)}>
                 Delete Photo
               </Button>
              )}
@@ -157,7 +193,7 @@ class UserPhotos extends Component {
                       {/* Delete Comment Button */}
                     {/* <h1>comment id : {photoComment._id}Photo commented user id: {photoComment.user_id} logged: {this.state.loggedInUserId}</h1> */}
                     {photoComment.user_id === this.state.loggedInUserId && (
-                      <Button variant="contained" color="secondary">
+                      <Button variant="contained" color="secondary" onClick={()=>this.handleDeleteCommentById(photoComment._id)}>
                         Delete Comment
                       </Button>
                     )}

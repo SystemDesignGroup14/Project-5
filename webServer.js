@@ -520,22 +520,21 @@ app.delete("/deletecommentbyid", checkSession, async (req, res) => {
   }
 });
 
-app.delete("/deleteuserphoto", checkSession, async (req, res) => {
+app.delete("/deletephotobyid", checkSession, async (req, res) => {
   const userId = req.session.userId;
-  const photoName = req.body.photoName;
-
+  const photoId = req.body.photoId;
   if (!userId) {
     return res.status(401).send("Unauthorized - No active session found");
   }
 
   try {
     // Check if file belongs to the actual user and then delete
-    const photo = await Photo.findOne({ user_id: userId, file_name: photoName }).exec();
+    const photo = await Photo.findOne({ user_id: userId, _id: photoId }).exec();
     if (!photo) {
       return res.status(404).send("Photo not found or does not belong to user");
     }
     // delete file in local
-    const filePath = path.join(__dirname, '/images', photoName);
+    const filePath = path.join(__dirname, '/images', photo.file_name);
     fs.unlink(filePath, async err => {
       if (err) {
         console.error("Failed to delete photo file:", err);
