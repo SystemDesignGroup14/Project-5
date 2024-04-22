@@ -12,6 +12,7 @@ class UserPhotos extends Component {
       photos: [],
       user: null,
       comment: null,
+      loggedInUserId : props.loggedInUserId,
       newComment: '', // Updated state name
       addComment: false, // Updated state name
       currentPhotoId: null, // Updated state name
@@ -102,7 +103,7 @@ class UserPhotos extends Component {
 
   render() {
     const { user, comment, photos, addComment, newComment } = this.state;
-
+    console.log("current logged in user: ",this.state.loggedInUserId);
     return (
       <div>
         {/* Render User Details Button */}
@@ -129,6 +130,14 @@ class UserPhotos extends Component {
                 alt={`User's pic is not available`}
                 className="photo-image"
               />
+             {/* Delete Photo Button */}
+             {photo.user_id === this.state.loggedInUserId && (
+              <Button variant="contained" color="secondary">
+                Delete Photo
+              </Button>
+             )}
+
+
               {/* Render Comments */}
               {photo.comments && photo.comments.length > 0 && (
                 <div>
@@ -145,6 +154,13 @@ class UserPhotos extends Component {
                           {photoComment.user.first_name} {photoComment.user.last_name}
                         </Link>
                       </p>
+                      {/* Delete Comment Button */}
+                    {/* <h1>comment id : {photoComment._id}Photo commented user id: {photoComment.user_id} logged: {this.state.loggedInUserId}</h1> */}
+                    {photoComment.user_id === this.state.loggedInUserId && (
+                      <Button variant="contained" color="secondary">
+                        Delete Comment
+                      </Button>
+                    )}
                     </div>
                   ))}
                 </div>

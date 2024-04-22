@@ -301,42 +301,44 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
   const userId = req.params.id;
 
   if (!mongoose.isValidObjectId(userId)) {
-      return response.status(400).send("Invalid user ID");
+    return response.status(400).send("Invalid user ID");
   }
 
   try {
-      const userExists = await User.findById(userId);
-      if (!userExists) {
-          return response.status(404).send("User not found");
-      }
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return response.status(404).send("User not found");
+    }
 
-      const photos = await Photo.find({ user_id: userId }).lean();
-      photos.forEach(photo => {
-        photo.comments = photo.comments || [];
-    });
+    let photos = await Photo.find({ user_id: userId }).lean();
     
-      // Refactored to use Promise.all()
-      const commentUserPromises = photos.map(photo => Promise.all(photo.comments.map(comment => User.findById(comment.user_id, '_id first_name last_name').then(user => {
-                  comment.user = {
-                      _id: user._id,
-                      first_name: user.first_name,
-                      last_name: user.last_name
-                  };
-                  delete comment.user_id;
-                  return comment;
-              })
-          ))
-      );
+    const promises = photos.map(photo => 
+      Promise.all(photo.comments.map(async comment => {
+        const user = await User.findById(comment.user_id, '_id first_name last_name');
+        return {
+          ...comment,
+          user: {
+            _id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name
+          }
+        };
+      }))
+      .then(commentsWithUser => {
+        photo.comments = commentsWithUser; // Assign the enhanced comments back to the photo
+        return photo;
+      })
+    );
 
-      // Await all promises for user details in comments
-      await Promise.all(commentUserPromises);
+    photos = await Promise.all(promises); // Ensure all photos have their comments enhanced
 
-      return response.status(200).json(photos);
+    return response.status(200).json(photos);
   } catch (error) {
-      console.error("Error processing request:", error);
-      return response.status(500).send("Internal Server Error");
+    console.error("Error processing request:", error);
+    return response.status(500).send("Internal Server Error");
   }
 });
+
 
 
 
