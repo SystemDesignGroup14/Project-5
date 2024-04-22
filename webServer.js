@@ -491,6 +491,64 @@ app.delete("/deleteaccount",checkSession ,async (req, res) => {
   }
 });
 
+app.delete("/deletecommentbyid", checkSession, async (req, res) => {
+  const userId = req.session.userId;
+  const commentId = req.body.commentId;
+
+  if (!userId) {
+    return res.status(401).send("Unauthorized - No active session found");
+  }
+
+  try {
+    // Locate the photo containing the comment and pull (remove) the comment from the array
+    const updateResult = await Photo.updateOne(
+      { "comments._id": commentId, "comments.user_id": userId },
+      { $pull: { comments: { _id: commentId } } }
+    );
+
+    // Check if the comment was successfully found and deleted
+    if (updateResult.modifiedCount === 0) {
+      return res.status(404).send("Comment not found or does not belong to user");
+    }
+
+    return res.status(200).send("Comment deleted successfully");
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.delete("/deleteuserphoto", checkSession, async (req, res) => {
+  const userId = req.session.userId;
+  const photoName = req.body.photoName;
+
+  if (!userId) {
+    return res.status(401).send("Unauthorized - No active session found");
+  }
+
+  try {
+    // Check if file belongs to the actual user and then delete
+    const photo = await Photo.findOne({ user_id: userId, file_name: photoName }).exec();
+    if (!photo) {
+      return res.status(404).send("Photo not found or does not belong to user");
+    }
+    // delete file in local
+    const filePath = path.join(__dirname, '/images', photoName);
+    fs.unlink(filePath, async err => {
+      if (err) {
+        console.error("Failed to delete photo file:", err);
+        return res.status(500).send("Failed to delete photo file");
+      }
+      // delete the user's photo record in the database
+      await Photo.deleteOne({ _id: photo._id });
+
+      return res.status(200).send("Photo deleted successfully");
+    });
+  } catch (error) {
+    console.error("Error deleting photo:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 
 

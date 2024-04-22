@@ -25,7 +25,7 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
       console.log(response.data);
       if (response.data) {
         toggleLogin(true);
-        changeCurrentLoggedInUser(`${response.data.first_name} ${response.data.last_name}`);
+        changeCurrentLoggedInUser(`${response.data.first_name} ${response.data.last_name}`, response.data._id);
       } else {
         toggleLogin(false);
         setLoginError('Login failed, please try again.');

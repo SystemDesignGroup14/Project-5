@@ -16,6 +16,7 @@ class PhotoShare extends React.Component {
     this.state = {
       labelOnTopBar: undefined,
       isLoggedIn: false,
+      userId:undefined,
       currentLoggedInUser: undefined,
       snackbarOpen: false, // Initialize snackbarOpen state
       snackbarMessage: '', // Initialize snackbarMessage state
@@ -32,8 +33,11 @@ class PhotoShare extends React.Component {
     this.setState({ labelOnTopBar: label });
   }
 
-  changeCurrentLoggedInUser(username) {
-    this.setState({ currentLoggedInUser: username });
+  changeCurrentLoggedInUser(username,userId) {
+    this.setState({
+      currentLoggedInUser: username,
+      userId: userId,
+    });
   }
 
   toggleLogin(isLoggedIn) {
@@ -47,6 +51,7 @@ class PhotoShare extends React.Component {
         console.log("Logout successful");
         this.setState({
           isLoggedIn: false,
+          userId :undefined,
           currentLoggedInUser: undefined,
           snackbarOpen: true,
           snackbarMessage: "Logout successful",
@@ -69,6 +74,7 @@ class PhotoShare extends React.Component {
        console.log("Account Deleted Successfully!");
        this.setState({
         isLoggedIn: false,
+        userId : undefined,
         currentLoggedInUser: undefined,
         snackbarOpen: true,
         snackbarMessage: "Account Deleted Successfully!",
@@ -139,7 +145,9 @@ class PhotoShare extends React.Component {
                         return this.state.isLoggedIn ? (
                           <UserPhotos
                             {...props}
-                            labelOnTopBar={this.changeLabelOnTopBar} />
+                            labelOnTopBar={this.changeLabelOnTopBar}
+                            userId={this.state.userId}
+                             />
                         ) : (
                           <Redirect to="/admin/login" />
                         );
