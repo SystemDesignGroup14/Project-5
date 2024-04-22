@@ -11,6 +11,7 @@ import LoginRegister from "./components/loginRegister/loginRegister";
 
 class PhotoShare extends React.Component {
   constructor(props) {
+
     super(props);
     this.state = {
       labelOnTopBar: undefined,
@@ -23,6 +24,7 @@ class PhotoShare extends React.Component {
     this.changeCurrentLoggedInUser = this.changeCurrentLoggedInUser.bind(this);
     this.toggleLogin = this.toggleLogin.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
+    this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
     this.handleSnackbarClose = this.handleSnackbarClose.bind(this); // Bind handleSnackbarClose
   }
 
@@ -59,6 +61,28 @@ class PhotoShare extends React.Component {
       });
   }
 
+  handleDeleteAccount(){
+    console.log("Delete account button is clicked!");
+
+    axios.delete("/deleteaccount")
+    .then(()=>{
+       console.log("Account Deleted Successfully!");
+       this.setState({
+        isLoggedIn: false,
+        currentLoggedInUser: undefined,
+        snackbarOpen: true,
+        snackbarMessage: "Account Deleted Successfully!",
+      });
+
+    }).catch((error)=>{
+      console.log("Unable to delete account",error);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Account Deletion failed",
+      });
+    });
+  }
+
   handleSnackbarClose() {
     this.setState({ snackbarOpen: false });
   }
@@ -73,6 +97,7 @@ class PhotoShare extends React.Component {
                 currentpageLabelOnTopBar={this.state.labelOnTopBar}
                 currentLoggedInUser={this.state.currentLoggedInUser}
                 handleLogout={this.handleLogout}
+                handleDeleteAccount ={this.handleDeleteAccount}
               />
             </Grid>
             <div className="main-topbar-buffer" />

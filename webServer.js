@@ -38,7 +38,7 @@ const multer = require("multer");
 const async = require("async");
 const express = require("express");
 const path = require("path");
-
+const fs = require("fs");
 
 const app = express();
 app.use(session({ secret: "secretKey", resave: false, saveUninitialized: false }));
@@ -54,7 +54,7 @@ mongoose.Promise = require("bluebird");
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://root:example@127.0.0.1:27017/project6?authSource=admin", {
+mongoose.connect("mongodb://127.0.0.1/project6", {
 
 useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -444,6 +444,53 @@ app.post("/commentsOfPhoto/:photo_id", checkSession, async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
+
+app.delete("/deleteaccount",checkSession ,async (req, res) => {
+  const userId = req.session.userId;
+
+  if (!userId) {
+    return res.status(401).send("Unauthorized - No active session found");
+  }
+
+  try {
+
+     // Fetch the list of photo filenames before deleting them from the database
+     const photos = await Photo.find({ user_id: userId }).exec();
+
+    // Delete the user's photos
+    await Photo.deleteMany({ user_id: userId });
+
+    // Delete the photo files from the /images folder
+    photos.forEach(photo => {
+      const filePath = path.join(__dirname, '/images', photo.file_name);
+      fs.unlink(filePath, err => {
+        if (err) {
+          console.error("Failed to delete photo file:", err);
+          // Note: Continue execution even if file deletion fails
+        }
+      });
+    });
+
+    // Delete the user
+    const userDeletionResult = await User.findByIdAndDelete(userId);
+    if (!userDeletionResult) {
+      return res.status(404).send("User not found");
+    }
+
+    // Destroy the session after deleting the account
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destruction error:", err);
+        return res.status(500).send("Error logging out");
+      }
+      res.status(200).send("Account and related data deleted successfully");
+    });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 
 
 

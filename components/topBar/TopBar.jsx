@@ -7,7 +7,7 @@ import axios from "axios";
 // Removed unused import
 // import { v4 as uuidv4 } from "uuid";
 
-function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout }) {
+function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,handleDeleteAccount }) {
   const [appVersion, setAppVersion] = useState(undefined);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -31,6 +31,7 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
   const handleAddPhotoClick = () => {
     fileInputRef.current.click();
   };
+
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -99,13 +100,20 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout })
               </>
             )}
 
-            <Typography variant="h5" color="inherit">
+            { currentLoggedInUser  && (<Typography variant="h5" color="inherit">
               {currentpageLabelOnTopBar || " "}
-            </Typography>
-
+            </Typography> )
+            }
             <Typography variant="h5" component="div" color="inherit">
               Version: {appVersion.version}
             </Typography>
+
+            {currentLoggedInUser && ( 
+            <Button variant="contained" onClick={handleDeleteAccount}>
+                   Delete Account
+            </Button>
+            
+            )}
 
             {currentLoggedInUser && (
               <Button variant="contained" onClick={handleLogout}>
