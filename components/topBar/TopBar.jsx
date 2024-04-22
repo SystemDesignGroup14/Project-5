@@ -2,6 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
 // Removed unused import
 // import { useHistory } from "react-router-dom";
 // Removed unused import
@@ -10,6 +17,7 @@ import axios from "axios";
 function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,handleDeleteAccount }) {
   const [appVersion, setAppVersion] = useState(undefined);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const fileInputRef = useRef(null);
   // Removed unused variable
@@ -70,6 +78,20 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
     setSnackbarOpen(false);
   };
 
+  const handleDialogOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setOpenDialog(false);
+    handleDeleteAccount();
+  };
+
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <div>
       {appVersion && (
@@ -109,7 +131,7 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
             </Typography>
 
             {currentLoggedInUser && ( 
-            <Button variant="contained" onClick={handleDeleteAccount}>
+            <Button variant="contained" onClick={handleDialogOpen}>
                    Delete Account
             </Button>
             
@@ -123,6 +145,23 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
           </Toolbar>
         </AppBar>
       )}
+
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>{"Confirm Account Deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete your account? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}
