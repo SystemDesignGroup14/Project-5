@@ -158,7 +158,7 @@ class UserPhotos extends Component {
         </Typography>
 
         {/* Render Photos */}
-        <div className="photo-list">
+        <div className="photo-list photo-image">
           {photos.map((photo) => (
             <div key={photo._id} className="photo-comment-container">
               <img
