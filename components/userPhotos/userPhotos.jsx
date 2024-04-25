@@ -3,6 +3,8 @@ import { Typography, Button, Dialog, DialogTitle, DialogContent, DialogContentTe
 import { Link } from 'react-router-dom';
 import './userPhotos.css';
 import axios from 'axios';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+
 // import TopBar from '../topBar/TopBar';
 
 class UserPhotos extends Component {
@@ -12,16 +14,37 @@ class UserPhotos extends Component {
       photos: [],
       user: null,
       comment: null,
-      loggedInUserId : props.loggedInUserId,
-      newComment: '', // Updated state name
-      addComment: false, // Updated state name
-      currentPhotoId: null, // Updated state name
+      loggedInUserId: props.loggedInUserId,
+      newComment: '',
+      addComment: false,
+      currentPhotoId: null,
+      likedPhotos: [],       // State to store liked photo IDs
+      likedMessage: '',      // State to display like message
     };
+
     // Bind event handlers to the instance
     this.handleShowAddComment = this.handleShowAddComment.bind(this);
     this.handleNewCommentChange = this.handleNewCommentChange.bind(this);
     this.handleCancelAddComment = this.handleCancelAddComment.bind(this);
     this.handleSubmitAddComment = this.handleSubmitAddComment.bind(this);
+    this.handleLikePhoto = this.handleLikePhoto.bind(this); // Bind handleLikePhoto
+  }
+
+  // Method to handle like/unlike of a photo
+  handleLikePhoto(photoId) {
+    const { likedPhotos } = this.state;
+    const updatedLikedPhotos = [...likedPhotos];
+
+    const index = updatedLikedPhotos.indexOf(photoId);
+    if (index === -1) {
+      updatedLikedPhotos.push(photoId); // Add photoId to likedPhotos array
+      this.setState({ likedMessage: 'Liked successfully' });
+    } else {
+      updatedLikedPhotos.splice(index, 1); // Remove photoId from likedPhotos array
+      this.setState({ likedMessage: '' });
+    }
+
+    this.setState({ likedPhotos: updatedLikedPhotos });
   }
 
   // Function to fetch user photos and details
@@ -138,7 +161,7 @@ class UserPhotos extends Component {
   }
 
   render() {
-    const { user, comment, photos, addComment, newComment } = this.state;
+    const { photos, likedPhotos, likedMessage, user, comment, addComment, newComment } = this.state;
     console.log("current logged in user: ",this.state.loggedInUserId);
     return (
       <div>
@@ -166,6 +189,15 @@ class UserPhotos extends Component {
                 alt={`User's pic is not available`}
                 className="photo-image"
               />
+{/* Like Button */}
+<div className="like-button">
+              <ThumbUpIcon
+                onClick={() => this.handleLikePhoto(photo._id)}
+                color={likedPhotos.includes(photo._id) ? 'primary' : 'action'}
+              />
+              <span>{likedPhotos.includes(photo._id) ? 'Liked' : ''}</span>
+            </div>
+
              {/* Delete Photo Button */}
              {photo.user_id === this.state.loggedInUserId && (
               <Button variant="contained" color="secondary" onClick={()=> this.handleDeletePhotoById(photo._id)}>
