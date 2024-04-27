@@ -35,7 +35,22 @@ class UserPhotos extends Component {
     try {
       const response = await axios.put(`/likephoto/${photoId}`);
       console.log(response.data.message);
-      this.fetchUserPhotosAndDetails();
+  
+      // Update the photos state with the updated like count in local
+      const updatedPhotos = this.state.photos.map((photo) => {
+        if (photo._id === photoId) {
+          const isLiked = photo.likes.some((like) => like.user_id === this.state.loggedInUserId);
+          const numLikes = isLiked ? photo.num_likes - 1 : photo.num_likes + 1;
+          const likes = isLiked
+            ? photo.likes.filter((like) => like.user_id !== this.state.loggedInUserId)
+            : [...photo.likes, { user_id: this.state.loggedInUserId }];
+  
+          return { ...photo, num_likes: numLikes, likes };
+        }
+        return photo;
+      });
+  
+      this.setState({ photos: updatedPhotos });
     } catch (error) {
       console.error('Error liking/unliking photo:', error);
     }
