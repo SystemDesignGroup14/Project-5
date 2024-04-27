@@ -14,6 +14,15 @@ const commentSchema = new mongoose.Schema({
   user_id: mongoose.Schema.Types.ObjectId,
 });
 
+const likeSchema = new mongoose.Schema({
+
+  // The ID of the user who created the comment.
+  user_id: mongoose.Schema.Types.ObjectId,
+  // The date and time when the comment was created.
+  date_time: { type: Date, default: Date.now },
+  
+ });
+
 /**
  * Define the Mongoose Schema for a Photo.
  */
@@ -26,6 +35,10 @@ const photoSchema = new mongoose.Schema({
   user_id: mongoose.Schema.Types.ObjectId,
   // Array of comment objects representing the comments made on this photo.
   comments: [commentSchema],
+  // Array of like objects representing the likes made on this photo.
+  likes: [likeSchema],
+  // The number of likes on this photo.
+  num_likes: { type: Number, default: 0 },
 });
 
 /**

@@ -326,13 +326,57 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
       }))
       .then(commentsWithUser => {
         photo.comments = commentsWithUser; // Assign the enhanced comments back to the photo
+        photo.num_likes = photo.num_likes; // Assign the number of likes to the photo
         return photo;
       })
     );
 
     photos = await Promise.all(promises); // Ensure all photos have their comments enhanced
 
+    photos.sort((a, b) => {
+      if (a.num_likes !== b.num_likes) {
+        return b.num_likes - a.num_likes; // Sort descending order
+      } else {
+        return b.date_time - a.date_time; // Sort  date_time in descending order (most recent first)
+      }
+    });
+
     return response.status(200).json(photos);
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return response.status(500).send("Internal Server Error");
+  }
+});
+
+app.put('/likephoto/:id', checkSession, async (req, response) => {
+  const photoId = req.params.id;
+  const userId = req.session.userId;
+
+  if (!mongoose.isValidObjectId(photoId) || !mongoose.isValidObjectId(userId)) {
+    return response.status(400).send("Invalid ID");
+  }
+
+  try {
+    const photo = await Photo.findById(photoId);
+    if (!photo) {
+      return response.status(404).send("Photo not found");
+    }
+
+    const likeIndex = photo.likes.findIndex(like => like.user_id.equals(userId));
+    let isLiked = likeIndex !== -1;
+
+    if (isLiked) {
+      // Unlike
+      photo.likes.splice(likeIndex, 1);
+      photo.num_likes--;
+    } else {
+      // Like
+      photo.likes.push({ user_id: userId, date_time: new Date() });
+      photo.num_likes++;
+    }
+
+    await photo.save();
+    return response.status(200).json({ message: `Photo ${isLiked ? 'unliked' : 'liked'}` });
   } catch (error) {
     console.error("Error processing request:", error);
     return response.status(500).send("Internal Server Error");

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import './userPhotos.css';
 import axios from 'axios';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-
+import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 // import TopBar from '../topBar/TopBar';
 
 class UserPhotos extends Component {
@@ -31,21 +31,17 @@ class UserPhotos extends Component {
   }
 
   // Method to handle like/unlike of a photo
-  handleLikePhoto(photoId) {
-    const { likedPhotos } = this.state;
-    const updatedLikedPhotos = [...likedPhotos];
-
-    const index = updatedLikedPhotos.indexOf(photoId);
-    if (index === -1) {
-      updatedLikedPhotos.push(photoId); // Add photoId to likedPhotos array
-      this.setState({ likedMessage: 'Liked successfully' });
-    } else {
-      updatedLikedPhotos.splice(index, 1); // Remove photoId from likedPhotos array
-      this.setState({ likedMessage: '' });
+  async handleLikePhoto(photoId) {
+    try {
+      const response = await axios.put(`/likephoto/${photoId}`);
+      console.log(response.data.message);
+      this.fetchUserPhotosAndDetails();
+    } catch (error) {
+      console.error('Error liking/unliking photo:', error);
     }
-
-    this.setState({ likedPhotos: updatedLikedPhotos });
   }
+
+  
 
   // Function to fetch user photos and details
   async fetchUserPhotosAndDetails() {
@@ -189,14 +185,21 @@ class UserPhotos extends Component {
                 alt={`User's pic is not available`}
                 className="photo-image"
               />
-{/* Like Button */}
-<div className="like-button">
-              <ThumbUpIcon
-                onClick={() => this.handleLikePhoto(photo._id)}
-                color={likedPhotos.includes(photo._id) ? 'primary' : 'action'}
-              />
-              <span>{likedPhotos.includes(photo._id) ? 'Liked' : ''}</span>
-            </div>
+              {/* Like Button */}
+              <div className="like-button">
+                {photo.likes.some((like) => like.user_id === this.state.loggedInUserId) ? (
+                  <ThumbUpIcon
+                    onClick={() => this.handleLikePhoto(photo._id)}
+                    color="primary"
+                  />
+                ) : (
+                  <ThumbUpOutlinedIcon
+                    onClick={() => this.handleLikePhoto(photo._id)}
+                    color="action"
+                  />
+                )}
+                <span>{photo.num_likes} Likes</span>
+              </div>
 
              {/* Delete Photo Button */}
              {photo.user_id === this.state.loggedInUserId && (
