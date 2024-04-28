@@ -1,0 +1,28 @@
+Project 8 - Submission Form
+
+Please fill in this form and submit it with your Project 8.
+
+Enter no more than 5 user stories that you did for the assignment that you would
+like to be graded on. For each story include the following information:
+
+Story: Visibility Control on photos(3)
+Story points: 4
+Description:
+Upon uploading a photo, a visibility list is created containing a list of users where the owner can choose who they want to display the post to. The post also contains a visibility button to edit the list. In case the owner fails to click on the button, the post would be available to everyone. Also, if the owner has clicked the button but has not edited the list, then the photo would still be visible to everyone.
+
+Story: Deleting Comments, Photos and Users(4)
+Story Points: 4
+Description:
+A delete button has been implemented below the post that allows the user to delete a photo. There is also an added option to delete a comment on a post, or even delete a user. A warning dialog box is shown prior to deleting any of the above mentioned functionalities.
+
+Story: Photo Like counts(6)
+Story Points: 4
+Description:
+A like counter is displayed below each picture. Upon liking a picture, the like counter goes up by 1. Also the photo with the most number of likes are ordered accordingly where the photo with the highest likes is placed on top.
+
+Total Story Points: 12
+
+Marketing Video URL:
+
+Any Special Instructions for grading:
+None
