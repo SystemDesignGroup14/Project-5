@@ -37,8 +37,50 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
   const [availableUsers, setAvailableUsers] = useState([]);
   const [userList, setUserList] = useState([]);
   const [sharingList, setSharingList] = useState([]);
+  const [userData, setUserData] = useState({
+    app_version: undefined,
+    photo_upload_show: false,
+    photo_upload_error: false,
+    photo_upload_success: false,
+    availableUsers: [],
+    userList: [],
+    userData: ""
+  });
+  const [isPrivate,setIsPrivate] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [userList, setUserList] = useState([]);
+  const [sharingList, setSharingList] = useState([]);
   // Removed unused variable
   // const history = useHistory(); 
+
+  const fetchAvailableUsers = () => {
+    axios
+      .get("/user/list")
+      .then((response) => {
+        console.log( response.data );
+        const users = response.data.map((user) => user.first_name);
+        // this.setState({ userData: response.data, availableUsers: users });
+        setUserData(response.data);
+        console.log(userData.userList);
+        setAvailableUsers(users);
+        console.log( users );
+      })
+      .catch((error) => {
+        console.error("Error fetching user list:", error);
+      });
+  };
+
+  const handleSharingListChange = (event, value) => {
+
+    setUserList(value);
+    setSharingList( userData
+      .filter((user) => value.includes(user.first_name))
+      .map((user) => user._id)  );
+  };
+
+  const handlePrivateCheckboxChange = () => {
+    setIsPrivate(!isPrivate);
+  };
 
   const fetchAvailableUsers = () => {
     axios
@@ -73,6 +115,9 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
     if(currentLoggedInUser){
       fetchAvailableUsers();
     }
+    if(currentLoggedInUser){
+      fetchAvailableUsers();
+    }
     const fetchAppVersion = async () => {
       try {
         const response = await axios.get("/test/info");
@@ -83,6 +128,7 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
     };
 
     fetchAppVersion();
+  }, [currentLoggedInUser]);
   }, [currentLoggedInUser]);
 
   const handleAddPhotoClick = () => {
@@ -105,6 +151,13 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
       const filename = `${currentLoggedInUser}_${year}_${month}_${date}_${hour}_${minutes}_${seconds}_${milliseconds}.${fileExtension}`;
       const formData = new FormData();
       formData.append("uploadedphoto", file, filename);
+      console.log(userData);
+      if( isPrivate ){
+        formData.append("sharingList", JSON.stringify([]));
+      } else {
+        formData.append("sharingList", JSON.stringify(sharingList));
+      }
+      formData.append("isPrivate", isPrivate);
       console.log(userData);
       if( isPrivate ){
         formData.append("sharingList", JSON.stringify([]));
@@ -164,6 +217,19 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
   };*/
 
 
+  /*
+  const handleSharingListChange = (event, value) => {
+    const { userData } = this.state;
+
+    this.setState({
+      userList: value,
+      sharingList: userData
+        .filter((user) => value.includes(user.first_name))
+        .map((user) => user._id),
+    });
+  };*/
+
+
   return (
     <div>
       {appVersion && (
@@ -179,6 +245,39 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
                 " Please Login"
               )}
             </Typography>
+            {currentLoggedInUser && (
+              <>
+              <Autocomplete
+                    multiple
+                    id="userList"
+                    options={availableUsers}
+                    value={userList}
+                    onChange={handleSharingListChange}
+                    disabled={isPrivate}
+                    onFocus={fetchAvailableUsers}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Sharing List (Usernames)"
+                        variant="standard"
+                      />
+                    )}
+                  />
+                  
+
+                <FormControlLabel
+                control={(
+                  <Checkbox
+                    checked={isPrivate}
+                    onChange={handlePrivateCheckboxChange}
+                    sx={{ marginRight: -0.2 }}
+                  />
+                )}
+                label="Owner Only"
+              />
+              </>
+
+            )}
             {currentLoggedInUser && (
               <>
               <Autocomplete
