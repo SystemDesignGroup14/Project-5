@@ -22,7 +22,7 @@ A like counter is displayed below each picture. Upon liking a picture, the like 
 
 Total Story Points: 12
 
-Marketing Video URL:
+Marketing Video URL: https://drive.google.com/file/d/1_S5IAF_yqvW_cWarbvy7nkClzDQIFtbS/view?usp=share_link
 
 Any Special Instructions for grading:
 None
