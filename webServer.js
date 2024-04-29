@@ -285,12 +285,13 @@ app.get("/user/:id", checkSession, function (request, response) {
       };
 
       response.status(200).json(userResponse);
+      return Promise.resolve();
     })
     .catch(err => {
       console.error("Error fetching user:", err);
       response.status(500).send("Internal Server Error");
     });
-    // return;
+    return Promise.resolve();
 });
 
 app.get("/user/list", checkSession, function (request, response) {
@@ -615,11 +616,13 @@ app.delete("/deleteaccount", checkSession, async (req, res) => {
         return res.status(500).send("Error logging out");
       }
       res.status(200).send("Account and related data deleted successfully");
+      return Promise.resolve();
     });
   } catch (error) {
     console.error("Error deleting account:", error);
     res.status(500).send("Internal Server Error");
   }
+  return Promise.resolve();
 });
 
 
@@ -648,6 +651,7 @@ app.delete("/deletecommentbyid", checkSession, async (req, res) => {
     console.error("Error deleting comment:", error);
     res.status(500).send("Internal Server Error");
   }
+  return Promise.resolve();
 });
 
 app.delete("/deletephotobyid", checkSession, async (req, res) => {
@@ -679,6 +683,7 @@ app.delete("/deletephotobyid", checkSession, async (req, res) => {
     console.error("Error deleting photo:", error);
     res.status(500).send("Internal Server Error");
   }
+  return Promise.resolve();
 });
 
 
