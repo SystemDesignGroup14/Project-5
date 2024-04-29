@@ -18,8 +18,8 @@ class UserPhotos extends Component {
       newComment: '',
       addComment: false,
       currentPhotoId: null,
-      likedPhotos: [],       // State to store liked photo IDs
-      likedMessage: '',      // State to display like message
+      //likedPhotos: [],       // State to store liked photo IDs
+      //likedMessage: '',      // State to display like message
     };
 
     // Bind event handlers to the instance
@@ -138,11 +138,12 @@ class UserPhotos extends Component {
   async handleDeleteCommentById(commentId) {
     console.log("Delete comment by id clicked", commentId);
     try {
-      const body = { 'commentId': commentId };
+      const body = { commentId: commentId };
       await axios.delete("/deletecommentbyid", { data: body })
         .then(response => {
           console.log("Comment deleted successfully");
           // Refetch user photos and details to update comments
+          console.log(response.data);
           this.fetchUserPhotosAndDetails();
         })
         .catch(error => {
@@ -156,11 +157,12 @@ class UserPhotos extends Component {
   async handleDeletePhotoById(photoId) {
     console.log("delete photo by id: ", photoId);
     try {
-      const body = { 'photoId': photoId };
+      const body = { photoId: photoId };
       await axios.delete("/deletephotobyid", { data: body })
         .then(response => {
           console.log("Photo deleted successfully");
           // Refetch user photos and details to update photos
+          console.log(response.data);
           this.fetchUserPhotosAndDetails();
         })
         .catch(error => {
@@ -172,7 +174,7 @@ class UserPhotos extends Component {
   }
 
   render() {
-    const { photos, likedPhotos, likedMessage, user, comment, addComment, newComment } = this.state;
+    const { photos, user, comment, addComment, newComment } = this.state;
     console.log("current logged in user: ",this.state.loggedInUserId);
     return (
       <div>
