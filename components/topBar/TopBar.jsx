@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
+//import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
 import {
@@ -11,7 +11,7 @@ import {
   Autocomplete,
   TextField,
   Checkbox,
-  FormControlLabel,
+  FormControlLabel,AppBar, Button, Toolbar, Typography, Snackbar
 } from "@mui/material";
 // Removed unused import
 // import { useHistory } from "react-router-dom";
@@ -224,10 +224,11 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
               </>
             )}
 
-            { currentLoggedInUser  && (<Typography variant="h5" color="inherit">
+            { currentLoggedInUser  && (
+            <Typography variant="h5" color="inherit">
               {currentpageLabelOnTopBar || " "}
-            </Typography> )
-            }
+            </Typography> 
+            )}
             <Typography variant="h5" component="div" color="inherit">
               Version: {appVersion.version}
             </Typography>
