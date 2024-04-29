@@ -370,7 +370,7 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
       }))
       .then(commentsWithUser => {
         photo.comments = commentsWithUser; // Assign the enhanced comments back to the photo
-        photo.num_likes = photo.num_likes; // Assign the number of likes to the photo
+        // photo.num_likes = photo.num_likes; // Assign the number of likes to the photo
         return photo;
       })
     );
@@ -581,7 +581,7 @@ app.delete("/deleteaccount", checkSession, async (req, res) => {
     // Remove all likes by this user from other photos using an atomic operation
     const likedPhotos = user.likedPhotos || [];
     for (const likedPhoto of likedPhotos) {
-      await Photo.updateOne(
+     await Photo.updateOne(
         { _id: likedPhoto.photo_id_of_photo_owner },
         { $pull: { likes: { user_id: userId } }, $inc: { num_likes: -1 } }
       );
