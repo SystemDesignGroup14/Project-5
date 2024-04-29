@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-//import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
 import {
@@ -13,10 +12,6 @@ import {
   Checkbox,
   FormControlLabel,AppBar, Button, Toolbar, Typography, Snackbar
 } from "@mui/material";
-// Removed unused import
-// import { useHistory } from "react-router-dom";
-// Removed unused import
-// import { v4 as uuidv4 } from "uuid";
 
 function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,handleDeleteAccount }) {
   const [appVersion, setAppVersion] = useState(undefined);
@@ -37,8 +32,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
   const [availableUsers, setAvailableUsers] = useState([]);
   const [userList, setUserList] = useState([]);
   const [sharingList, setSharingList] = useState([]);
-  // Removed unused variable
-  // const history = useHistory(); 
 
   const fetchAvailableUsers = () => {
     axios
@@ -46,7 +39,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
       .then((response) => {
         console.log( response.data );
         const users = response.data.map((user) => user.first_name);
-        // this.setState({ userData: response.data, availableUsers: users });
         setUserData(response.data);
         console.log(userData.userList);
         setAvailableUsers(users);
@@ -122,7 +114,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
         console.log("Photo uploaded successfully:", response.data);
         setSnackbarMessage('Photo uploaded successfully!');
         setSnackbarOpen(true);
-        //resetting the input chips for sharing list
         setUserList([]);
         setSharingList([]);
       } catch (error) {
@@ -150,18 +141,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
-
-  /*
-  const handleSharingListChange = (event, value) => {
-    const { userData } = this.state;
-
-    this.setState({
-      userList: value,
-      sharingList: userData
-        .filter((user) => value.includes(user.first_name))
-        .map((user) => user._id),
-    });
-  };*/
 
 
   return (
