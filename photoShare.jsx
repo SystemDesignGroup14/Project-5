@@ -126,21 +126,18 @@ class PhotoShare extends React.Component {
                   </Route>
                   <Route
                     path="/users/:userId"
-                    render={(props) =>
-                      this.state.isLoggedIn ? (
+                    render={(props) => (this.state.isLoggedIn ? (
                         <UserDetail
                           {...props}
                           labelOnTopBar={this.changeLabelOnTopBar}
                         />
                       ) : (
                         <Redirect to="/admin/login" />
-                      )
-                    }
+                      ))}
                   />
                   <Route
                     path="/photos/:userId"
-                    render={(props) =>
-                      this.state.isLoggedIn ? (
+                    render={(props) => (this.state.isLoggedIn ? (
                         <UserPhotos
                           {...props}
                           labelOnTopBar={this.changeLabelOnTopBar}
@@ -148,13 +145,11 @@ class PhotoShare extends React.Component {
                         />
                       ) : (
                         <Redirect to="/admin/login" />
-                      )
-                    }
+                      ))}
                   />
                   <Route
                     path="/admin/login"
-                    render={(props) =>
-                      this.state.isLoggedIn ? (
+                    render={(props) => (this.state.isLoggedIn ? (
                         <Redirect to="/" />
                       ) : (
                         <LoginRegister
@@ -163,8 +158,7 @@ class PhotoShare extends React.Component {
                           changeCurrentLoggedInUser={this.changeCurrentLoggedInUser}
                           handleLogout={this.handleLogout}
                         />
-                      )
-                    }
+                      ))}
                   />
                   
                 </Switch>
