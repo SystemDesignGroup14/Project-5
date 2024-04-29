@@ -5,7 +5,6 @@ import './userPhotos.css';
 import axios from 'axios';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
-// import TopBar from '../topBar/TopBar';
 
 class UserPhotos extends Component {
   constructor(props) {
@@ -18,25 +17,20 @@ class UserPhotos extends Component {
       newComment: '',
       addComment: false,
       currentPhotoId: null,
-      //likedPhotos: [],       // State to store liked photo IDs
-      //likedMessage: '',      // State to display like message
     };
 
-    // Bind event handlers to the instance
     this.handleShowAddComment = this.handleShowAddComment.bind(this);
     this.handleNewCommentChange = this.handleNewCommentChange.bind(this);
     this.handleCancelAddComment = this.handleCancelAddComment.bind(this);
     this.handleSubmitAddComment = this.handleSubmitAddComment.bind(this);
-    this.handleLikePhoto = this.handleLikePhoto.bind(this); // Bind handleLikePhoto
+    this.handleLikePhoto = this.handleLikePhoto.bind(this);
   }
 
-  // Method to handle like/unlike of a photo
   async handleLikePhoto(photoId) {
     try {
       const response = await axios.put(`/likephoto/${photoId}`);
       console.log(response.data.message);
   
-      // Update the photos state with the updated like count in local
       const updatedPhotos = this.state.photos.map((photo) => {
         if (photo._id === photoId) {
           const isLiked = photo?.likes?.some((like) => like.user_id === this.state.loggedInUserId);
@@ -58,7 +52,6 @@ class UserPhotos extends Component {
 
   
 
-  // Function to fetch user photos and details
   async fetchUserPhotosAndDetails() {
     const { userId } = this.props.match.params;
 
@@ -80,7 +73,6 @@ class UserPhotos extends Component {
     }
   }
 
-  // Event handler to show the add comment dialog
   handleShowAddComment(photoId) {
     this.setState({
       addComment: true,
@@ -88,14 +80,12 @@ class UserPhotos extends Component {
     });
   }
 
-  // Event handler for changing the new comment text
   handleNewCommentChange(event) {
     this.setState({
       newComment: event.target.value,
     });
   }
 
-  // Event handler for canceling the add comment dialog
   handleCancelAddComment() {
     this.setState({
       addComment: false,
@@ -104,20 +94,17 @@ class UserPhotos extends Component {
     });
   }
 
-  // Event handler for submitting the new comment
   async handleSubmitAddComment() {
     const { currentPhotoId, newComment } = this.state;
 
     try {
       await axios.post(`/commentsOfPhoto/${currentPhotoId}`, { comment: newComment });
       console.log('Comment added successfully');
-      // Update state to close the dialog and reset newComment
       this.setState({
         addComment: false,
         newComment: '',
         currentPhotoId: null,
       });
-      // Refetch user photos and details to update comments
       this.fetchUserPhotosAndDetails();
     } catch (error) {
       console.error('Error adding comment:', error);
@@ -142,7 +129,6 @@ class UserPhotos extends Component {
       await axios.delete("/deletecommentbyid", { data: body })
         .then(response => {
           console.log("Comment deleted successfully");
-          // Refetch user photos and details to update comments
           console.log(response.data);
           this.fetchUserPhotosAndDetails();
         })
@@ -161,7 +147,6 @@ class UserPhotos extends Component {
       await axios.delete("/deletephotobyid", { data: body })
         .then(response => {
           console.log("Photo deleted successfully");
-          // Refetch user photos and details to update photos
           console.log(response.data);
           this.fetchUserPhotosAndDetails();
         })
@@ -178,7 +163,6 @@ class UserPhotos extends Component {
     console.log("current logged in user: ",this.state.loggedInUserId);
     return (
       <div>
-        {/* Render User Details Button */}
         <Button
           component={Link}
           to={`/users/${this.props.match.params.userId}`}
@@ -188,12 +172,10 @@ class UserPhotos extends Component {
           User Details
         </Button>
 
-        {/* Render User Photos Header */}
         <Typography variant="h4" className="UserPhotosHeader">
           User Photos
         </Typography>
 
-        {/* Render Photos */}
         <div className="photo-list photo-image">
           {photos.map((photo) => (
             <div key={photo._id} className="photo-comment-container">
@@ -202,7 +184,6 @@ class UserPhotos extends Component {
                 alt={`User's pic is not available`}
                 className="photo-image"
               />
-              {/* Like Button */}
               <div className="like-button">
                 {photo.likes.some((like) => like.user_id === this.state.loggedInUserId) ? (
                   <ThumbUpIcon
@@ -218,7 +199,6 @@ class UserPhotos extends Component {
                 <span>{photo.num_likes} Likes</span>
               </div>
 
-             {/* Delete Photo Button */}
              {photo.user_id === this.state.loggedInUserId && (
               <Button variant="contained" color="secondary" onClick={()=> this.handleDeletePhotoById(photo._id)}>
                 Delete Photo
@@ -226,7 +206,6 @@ class UserPhotos extends Component {
              )}
 
 
-              {/* Render Comments */}
               {photo.comments && photo.comments.length > 0 && (
                 <div>
                   <p style={{ margin: 0, fontWeight: 'bold' }}>Comments:</p>
