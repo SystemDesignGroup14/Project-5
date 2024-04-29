@@ -290,7 +290,7 @@ app.get("/user/:id", checkSession, function (request, response) {
       console.error("Error fetching user:", err);
       response.status(500).send("Internal Server Error");
     });
-    // return;
+    return response.status(200).send("Retrieved user id");
 });
 
 app.get("/user/list", checkSession, function (request, response) {
@@ -356,8 +356,7 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
       });
     }
     
-    const promises = photos.map(photo => 
-      Promise.all(photo.comments.map(async comment => {
+    const promises = photos.map(photo => Promise.all(photo.comments.map(async comment => {
         const user = await User.findById(comment.user_id, '_id first_name last_name');
         return {
           ...comment,
@@ -370,7 +369,10 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
       }))
       .then(commentsWithUser => {
         photo.comments = commentsWithUser; // Assign the enhanced comments back to the photo
+<<<<<<< Updated upstream
         // photo.num_likes = photo.num_likes; // Assign the number of likes to the photo
+=======
+>>>>>>> Stashed changes
         return photo;
       })
     );
@@ -579,13 +581,33 @@ app.delete("/deleteaccount", checkSession, async (req, res) => {
     }
 
     // Remove all likes by this user from other photos using an atomic operation
+    // const likedPhotos = user.likedPhotos || [];
+    // for (const likedPhoto of likedPhotos) {
+    //   await Photo.updateOne(
+    //     { _id: likedPhoto.photo_id_of_photo_owner },
+    //     { $pull: { likes: { user_id: userId } }, $inc: { num_likes: -1 } }
+    //   );
+    // }
+
     const likedPhotos = user.likedPhotos || [];
+<<<<<<< Updated upstream
     for (const likedPhoto of likedPhotos) {
      await Photo.updateOne(
         { _id: likedPhoto.photo_id_of_photo_owner },
         { $pull: { likes: { user_id: userId } }, $inc: { num_likes: -1 } }
       );
     }
+=======
+    const updatePromises = likedPhotos.map(async likedPhoto => {
+        await Photo.updateOne(
+            { _id: likedPhoto.photo_id_of_photo_owner },
+            { $pull: { likes: { user_id: userId } }, $inc: { num_likes: -1 } }
+        );
+    });
+
+    await Promise.all(updatePromises);
+
+>>>>>>> Stashed changes
 
     // Fetch the list of photo filenames before deleting them from the database
     const photos = await Photo.find({ user_id: userId });
