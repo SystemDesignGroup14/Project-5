@@ -122,6 +122,9 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
         console.log("Photo uploaded successfully:", response.data);
         setSnackbarMessage('Photo uploaded successfully!');
         setSnackbarOpen(true);
+        //resetting the input chips for sharing list
+        setUserList([]);
+        setSharingList([]);
       } catch (error) {
         console.error("Error uploading photo:", error);
         setSnackbarMessage('Error uploading photo');
