@@ -39,6 +39,10 @@ const photoSchema = new mongoose.Schema({
   likes: [likeSchema],
   // The number of likes on this photo.
   num_likes: { type: Number, default: 0 },
+  //Photo sharing list for users
+  sharingList: [String],
+  //isPrivate only owner can see
+  isPrivate: Boolean,
 });
 
 /**

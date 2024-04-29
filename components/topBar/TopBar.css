@@ -29,3 +29,12 @@
     text-align: right;
   }
 }
+.topbar-appBar {
+.css-bxepqz-MuiButtonBase-root-MuiCheckbox-root {
+  padding: 9px 0 9px 9px;
+
+  &.Mui-checked {
+    color: white;
+  }
+}
+}

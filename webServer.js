@@ -293,12 +293,33 @@ app.get("/user/:id", checkSession, function (request, response) {
     // return;
 });
 
+app.get("/user/list", checkSession, function (request, response) {
+  console.log('API CALL');
+  const projection = {
+    _id:1,
+    first_name:1,
+    last_name:1
+  };
+    User.find({}, projection, function (err, userDetails) {
+      if (err) {
+        console.error("Error in /user/list:", err);
+        response.status(500).send(JSON.stringify(err));
+      } else if (userDetails.length === 0) {
+        response.status(400).send("Missing user list");
+      } else {
+        response.end(JSON.stringify(userDetails));
+      }
+    });
+});
+
 
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
 app.get('/photosOfUser/:id', checkSession, async (req, response) => {
   const userId = req.params.id;
+  const currentLoggedUserId = req.query.currentLoggedUserId;
+  console.log( `params: ${currentLoggedUserId}` );
 
   if (!mongoose.isValidObjectId(userId)) {
     return response.status(400).send("Invalid user ID");
@@ -310,7 +331,30 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
       return response.status(404).send("User not found");
     }
 
-    let photos = await Photo.find({ user_id: userId }).lean();
+    let current_photos = await Photo.find({ user_id: userId }).lean();
+    let photos = [];
+    // if( userId === currentLoggedUserId ){
+    //   photos = current_photos;
+    // } else{
+    //   current_photos.forEach( (photo => {
+    //     if(( !photo.isPrivate && photo.sharingList.includes( currentLoggedUserId )) ){
+    //       photos.push(photo);
+    //     }
+    //   }) );
+    // }
+
+    if (userId === currentLoggedUserId) {
+      console.log(`userId: ${userId}, ${currentLoggedUserId}`);
+      photos = current_photos;
+    } else {
+      current_photos.forEach((photo) => {
+        if (
+          (!photo.isPrivate && (photo.sharingList.includes(currentLoggedUserId) || photo.sharingList.length === 0))
+        ){
+          photos.push( photo );
+        }
+      });
+    }
     
     const promises = photos.map(photo => 
       Promise.all(photo.comments.map(async comment => {
@@ -357,31 +401,54 @@ app.put('/likephoto/:id', checkSession, async (req, response) => {
   }
 
   try {
+    // Check if the photo exists
     const photo = await Photo.findById(photoId);
     if (!photo) {
       return response.status(404).send("Photo not found");
     }
 
-    const likeIndex = photo.likes.findIndex(like => like.user_id.equals(userId));
-    let isLiked = likeIndex !== -1;
+    // Determine if the user has already liked the photo
+    const alreadyLiked = photo.likes.some(like => like.user_id.equals(userId));
 
-    if (isLiked) {
-      // Unlike
-      photo.likes.splice(likeIndex, 1);
-      photo.num_likes--;
+    if (alreadyLiked) {
+      // Unlike the photo
+      await Photo.updateOne(
+        { _id: photoId },
+        {
+          $pull: { likes: { user_id: userId } },
+          $inc: { num_likes: -1 }
+        }
+      );
+      // Remove like from currentLoggedInUser's likedPhotos
+      await User.updateOne(
+        { _id: userId },
+        { $pull: { likedPhotos: { photo_id_of_photo_owner: photoId } } }
+      );
     } else {
-      // Like
-      photo.likes.push({ user_id: userId, date_time: new Date() });
-      photo.num_likes++;
+      // Like the photo
+      await Photo.updateOne(
+        { _id: photoId },
+        {
+          $push: { likes: { user_id: userId, date_time: new Date() } },
+          $inc: { num_likes: 1 }
+        }
+      );
+      // Add like to currentLoggedInUser's likedPhotos
+      await User.updateOne(
+        { _id: userId },
+        {
+          $push: { likedPhotos: { _id: new mongoose.Types.ObjectId(), photo_id_of_photo_owner: photoId, user_id_of_photo_owner: photo.user_id } }
+        }
+      );
     }
 
-    await photo.save();
-    return response.status(200).json({ message: `Photo ${isLiked ? 'unliked' : 'liked'}` });
+    return response.status(200).json({ message: `Photo ${alreadyLiked ? 'unliked' : 'liked'}` });
   } catch (error) {
     console.error("Error processing request:", error);
     return response.status(500).send("Internal Server Error");
   }
 });
+
 
 
 
@@ -439,11 +506,17 @@ app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req
   }
   
   try {
+
+    const sharingList = JSON.parse(req.body.sharingList || "[]");
+    const isPrivate = req.body.isPrivate;
+
     const newPhoto = new Photo({
       file_name: req.file.filename,
       user_id: req.session.userId,
       date_time: new Date(),
-      comments: []
+      comments: [],
+      sharingList: sharingList,
+      isPrivate: isPrivate
     });
     
     // newPhoto.save().then((photo) => {
@@ -491,7 +564,7 @@ app.post("/commentsOfPhoto/:photo_id", checkSession, async (req, res) => {
   }
 });
 
-app.delete("/deleteaccount",checkSession ,async (req, res) => {
+app.delete("/deleteaccount", checkSession, async (req, res) => {
   const userId = req.session.userId;
 
   if (!userId) {
@@ -499,32 +572,42 @@ app.delete("/deleteaccount",checkSession ,async (req, res) => {
   }
 
   try {
+    // Retrieve the user document to access liked photos
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
 
-     // Fetch the list of photo filenames before deleting them from the database
-     const photos = await Photo.find({ user_id: userId }).exec();
+    // Remove all likes by this user from other photos using an atomic operation
+    const likedPhotos = user.likedPhotos || [];
+    for (const likedPhoto of likedPhotos) {
+      await Photo.updateOne(
+        { _id: likedPhoto.photo_id_of_photo_owner },
+        { $pull: { likes: { user_id: userId } }, $inc: { num_likes: -1 } }
+      );
+    }
+
+    // Fetch the list of photo filenames before deleting them from the database
+    const photos = await Photo.find({ user_id: userId });
 
     // Delete the user's photos
     await Photo.deleteMany({ user_id: userId });
 
     // Delete the photo files from the /images folder
-    photos.forEach(photo => {
+    for (const photo of photos) {
       const filePath = path.join(__dirname, '/images', photo.file_name);
       fs.unlink(filePath, err => {
         if (err) {
           console.error("Failed to delete photo file:", err);
-          // Note: Continue execution even if file deletion fails
         }
       });
-    });
-
-    // Delete the user
-    const userDeletionResult = await User.findByIdAndDelete(userId);
-    if (!userDeletionResult) {
-      return res.status(404).send("User not found");
     }
 
+    // Delete the user
+    await User.findByIdAndDelete(userId);
+
     // Destroy the session after deleting the account
-    req.session.destroy((err) => {
+    req.session.destroy(err => {
       if (err) {
         console.error("Session destruction error:", err);
         return res.status(500).send("Error logging out");
@@ -536,6 +619,7 @@ app.delete("/deleteaccount",checkSession ,async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 app.delete("/deletecommentbyid", checkSession, async (req, res) => {
   const userId = req.session.userId;
