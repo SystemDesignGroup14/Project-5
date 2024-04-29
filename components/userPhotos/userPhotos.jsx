@@ -39,7 +39,7 @@ class UserPhotos extends Component {
       // Update the photos state with the updated like count in local
       const updatedPhotos = this.state.photos.map((photo) => {
         if (photo._id === photoId) {
-          const isLiked = photo.likes.some((like) => like.user_id === this.state.loggedInUserId);
+          const isLiked = photo?.likes?.some((like) => like.user_id === this.state.loggedInUserId);
           const numLikes = isLiked ? photo.num_likes - 1 : photo.num_likes + 1;
           const likes = isLiked
             ? photo.likes.filter((like) => like.user_id !== this.state.loggedInUserId)
@@ -63,7 +63,7 @@ class UserPhotos extends Component {
     const { userId } = this.props.match.params;
 
     try {
-      const photosResponse = await axios.get(`/photosOfUser/${userId}`);
+      const photosResponse = await axios.get(`/photosOfUser/${userId}?currentLoggedUserId=${this.state.loggedInUserId}`);
       this.setState({ photos: photosResponse.data });
 
       const userDetailsResponse = await axios.get(`/user/${userId}`);

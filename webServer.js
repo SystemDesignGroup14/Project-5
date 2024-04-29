@@ -293,12 +293,33 @@ app.get("/user/:id", checkSession, function (request, response) {
     // return;
 });
 
+app.get("/user/list", checkSession, function (request, response) {
+  console.log('API CALL');
+  const projection = {
+    _id:1,
+    first_name:1,
+    last_name:1
+  };
+    User.find({}, projection, function (err, userDetails) {
+      if (err) {
+        console.error("Error in /user/list:", err);
+        response.status(500).send(JSON.stringify(err));
+      } else if (userDetails.length === 0) {
+        response.status(400).send("Missing user list");
+      } else {
+        response.end(JSON.stringify(userDetails));
+      }
+    });
+});
+
 
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
 app.get('/photosOfUser/:id', checkSession, async (req, response) => {
   const userId = req.params.id;
+  const currentLoggedUserId = req.query.currentLoggedUserId;
+  console.log( `params: ${currentLoggedUserId}` );
 
   if (!mongoose.isValidObjectId(userId)) {
     return response.status(400).send("Invalid user ID");
@@ -310,7 +331,30 @@ app.get('/photosOfUser/:id', checkSession, async (req, response) => {
       return response.status(404).send("User not found");
     }
 
-    let photos = await Photo.find({ user_id: userId }).lean();
+    let current_photos = await Photo.find({ user_id: userId }).lean();
+    let photos = [];
+    // if( userId === currentLoggedUserId ){
+    //   photos = current_photos;
+    // } else{
+    //   current_photos.forEach( (photo => {
+    //     if(( !photo.isPrivate && photo.sharingList.includes( currentLoggedUserId )) ){
+    //       photos.push(photo);
+    //     }
+    //   }) );
+    // }
+
+    if (userId === currentLoggedUserId) {
+      console.log(`userId: ${userId}, ${currentLoggedUserId}`);
+      photos = current_photos;
+    } else {
+      current_photos.forEach((photo) => {
+        if (
+          (!photo.isPrivate && (photo.sharingList.includes(currentLoggedUserId) || photo.sharingList.length === 0))
+        ){
+          photos.push( photo );
+        }
+      });
+    }
     
     const promises = photos.map(photo => 
       Promise.all(photo.comments.map(async comment => {
@@ -462,11 +506,17 @@ app.post('/photos/new', checkSession, upload.single('uploadedphoto'), async (req
   }
   
   try {
+
+    const sharingList = JSON.parse(req.body.sharingList || "[]");
+    const isPrivate = req.body.isPrivate;
+
     const newPhoto = new Photo({
       file_name: req.file.filename,
       user_id: req.session.userId,
       date_time: new Date(),
-      comments: []
+      comments: [],
+      sharingList: sharingList,
+      isPrivate: isPrivate
     });
     
     // newPhoto.save().then((photo) => {
