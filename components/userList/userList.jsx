@@ -47,7 +47,7 @@ class UserList extends Component {
 
   render() {
     return (
-      <div>
+      
       <div className="usersLayout">
         <Typography variant="h6" className="listTitle">
           Users
@@ -57,7 +57,7 @@ class UserList extends Component {
         </List>
        
       </div>
-      </div>
+      
     );
   }
 }
