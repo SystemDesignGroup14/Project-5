@@ -2,6 +2,13 @@
 
 const mongoose = require("mongoose");
 
+
+const userLikedPhotosSchema = new mongoose.Schema({
+
+    user_id_of_photo_owner : mongoose.Schema.Types.ObjectId,
+    photo_id_of_photo_owner : mongoose.Schema.Types.ObjectId, 
+});
+
 /**
  * Define the Mongoose Schema for a Comment.
  */
@@ -13,6 +20,7 @@ const userSchema = new mongoose.Schema({
   occupation: String,
   login_name: String,
   password: String,
+  likedPhotos: [ userLikedPhotosSchema ],
 });
 
 /**
