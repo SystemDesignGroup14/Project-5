@@ -50,7 +50,7 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
       });
       console.log(response.data);
       setRegistrationSuccess(true);
-      setShowRegistrationForm(false); // Hide registration form after successful registration
+      setShowRegistrationForm(false);
       setLoginError('');
     } catch (error) {
       console.error('Registration error:', error);
@@ -97,7 +97,6 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
         )}
       </Box>
 
-      {/* Display Registration Form if showRegistrationForm is true */}
       {showRegistrationForm && (
         <Box component="form" onSubmit={handleRegister} width="100%" maxWidth={360}>
           <TextField
@@ -173,7 +172,6 @@ function LoginRegister({ toggleLogin, changeCurrentLoggedInUser }) {
         </Box>
       )}
 
-      {/* Show Register Button if registration form is not displayed */}
       {!showRegistrationForm && (
         <Button variant="contained" onClick={() => setShowRegistrationForm(true)}>
           Register
