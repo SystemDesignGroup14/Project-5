@@ -25,4 +25,4 @@ Total Story Points: 12
 Marketing Video URL: https://drive.google.com/file/d/1_S5IAF_yqvW_cWarbvy7nkClzDQIFtbS/view?usp=share_link
 
 Any Special Instructions for grading:
-None
+The first time 'npm test', 5 test cases are initially failing. However, when npm test is executed twice or thrice again, only two test cases fail. When we execute the node loadDatabase command on top of this, the next time npm test runs, only 1 test case fails. This failing test case is because of our updation to the photo schema.
