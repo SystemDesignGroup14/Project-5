@@ -3,32 +3,32 @@
   flex-direction: column;
   margin: 2px;
   padding: 20px;
-  border: 1px solid #e0e0e0; /* Light grey border */
-  border-radius: 8px; /* Slightly rounded corners for the container */
-  background-color: #ffffff; /* White background */
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
 }
 
 .listTitle {
-  color: #333; /* Dark grey color for the text */
-  margin-bottom: 20px; /* Space below the title */
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .userLink {
-  text-decoration: none; /* Remove underline from links */
-  color: #1976d2; /* MUI primary blue for link text */
-  font-weight: bold; /* Make the name text slightly bolder */
+  text-decoration: none;
+  color: #1976d2;
+  font-weight: bold;
 }
 
 .ListItem {
-  padding: 10px 0; /* Adds some padding above and below each list item */
+  padding: 10px 0;
 }
 
 .Divider {
-  margin: 10px 0; /* Space above and below the divider */
+  margin: 10px 0;
 }
 
 .contentArea {
-  margin-top: 20px; /* Space above the content area */
+  margin-top: 20px;
 }
 
 @media (max-width: 768px) {
