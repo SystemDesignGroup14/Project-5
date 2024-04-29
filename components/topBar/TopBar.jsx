@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-//import { AppBar, Button, Toolbar, Typography, Snackbar } from "@mui/material";
 import "./TopBar.css";
 import axios from "axios";
 import {
@@ -13,10 +12,6 @@ import {
   Checkbox,
   FormControlLabel,AppBar, Button, Toolbar, Typography, Snackbar
 } from "@mui/material";
-// Removed unused import
-// import { useHistory } from "react-router-dom";
-// Removed unused import
-// import { v4 as uuidv4 } from "uuid";
 
 function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,handleDeleteAccount }) {
   const [appVersion, setAppVersion] = useState(undefined);
@@ -37,21 +32,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
   const [availableUsers, setAvailableUsers] = useState([]);
   const [userList, setUserList] = useState([]);
   const [sharingList, setSharingList] = useState([]);
-  const [userData, setUserData] = useState({
-    app_version: undefined,
-    photo_upload_show: false,
-    photo_upload_error: false,
-    photo_upload_success: false,
-    availableUsers: [],
-    userList: [],
-    userData: ""
-  });
-  const [isPrivate,setIsPrivate] = useState(false);
-  const [availableUsers, setAvailableUsers] = useState([]);
-  const [userList, setUserList] = useState([]);
-  const [sharingList, setSharingList] = useState([]);
-  // Removed unused variable
-  // const history = useHistory(); 
 
   const fetchAvailableUsers = () => {
     axios
@@ -59,36 +39,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
       .then((response) => {
         console.log( response.data );
         const users = response.data.map((user) => user.first_name);
-        // this.setState({ userData: response.data, availableUsers: users });
-        setUserData(response.data);
-        console.log(userData.userList);
-        setAvailableUsers(users);
-        console.log( users );
-      })
-      .catch((error) => {
-        console.error("Error fetching user list:", error);
-      });
-  };
-
-  const handleSharingListChange = (event, value) => {
-
-    setUserList(value);
-    setSharingList( userData
-      .filter((user) => value.includes(user.first_name))
-      .map((user) => user._id)  );
-  };
-
-  const handlePrivateCheckboxChange = () => {
-    setIsPrivate(!isPrivate);
-  };
-
-  const fetchAvailableUsers = () => {
-    axios
-      .get("/user/list")
-      .then((response) => {
-        console.log( response.data );
-        const users = response.data.map((user) => user.first_name);
-        // this.setState({ userData: response.data, availableUsers: users });
         setUserData(response.data);
         console.log(userData.userList);
         setAvailableUsers(users);
@@ -115,9 +65,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
     if(currentLoggedInUser){
       fetchAvailableUsers();
     }
-    if(currentLoggedInUser){
-      fetchAvailableUsers();
-    }
     const fetchAppVersion = async () => {
       try {
         const response = await axios.get("/test/info");
@@ -128,7 +75,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
     };
 
     fetchAppVersion();
-  }, [currentLoggedInUser]);
   }, [currentLoggedInUser]);
 
   const handleAddPhotoClick = () => {
@@ -158,13 +104,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
         formData.append("sharingList", JSON.stringify(sharingList));
       }
       formData.append("isPrivate", isPrivate);
-      console.log(userData);
-      if( isPrivate ){
-        formData.append("sharingList", JSON.stringify([]));
-      } else {
-        formData.append("sharingList", JSON.stringify(sharingList));
-      }
-      formData.append("isPrivate", isPrivate);
       let response;
       try {
          response = await axios.post("/photos/new", formData, {
@@ -175,7 +114,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
         console.log("Photo uploaded successfully:", response.data);
         setSnackbarMessage('Photo uploaded successfully!');
         setSnackbarOpen(true);
-        //resetting the input chips for sharing list
         setUserList([]);
         setSharingList([]);
       } catch (error) {
@@ -204,31 +142,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
     setOpenDialog(false);
   };
 
-  /*
-  const handleSharingListChange = (event, value) => {
-    const { userData } = this.state;
-
-    this.setState({
-      userList: value,
-      sharingList: userData
-        .filter((user) => value.includes(user.first_name))
-        .map((user) => user._id),
-    });
-  };*/
-
-
-  /*
-  const handleSharingListChange = (event, value) => {
-    const { userData } = this.state;
-
-    this.setState({
-      userList: value,
-      sharingList: userData
-        .filter((user) => value.includes(user.first_name))
-        .map((user) => user._id),
-    });
-  };*/
-
 
   return (
     <div>
@@ -245,39 +158,6 @@ function TopBar({ currentLoggedInUser, currentpageLabelOnTopBar, handleLogout,ha
                 " Please Login"
               )}
             </Typography>
-            {currentLoggedInUser && (
-              <>
-              <Autocomplete
-                    multiple
-                    id="userList"
-                    options={availableUsers}
-                    value={userList}
-                    onChange={handleSharingListChange}
-                    disabled={isPrivate}
-                    onFocus={fetchAvailableUsers}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Sharing List (Usernames)"
-                        variant="standard"
-                      />
-                    )}
-                  />
-                  
-
-                <FormControlLabel
-                control={(
-                  <Checkbox
-                    checked={isPrivate}
-                    onChange={handlePrivateCheckboxChange}
-                    sx={{ marginRight: -0.2 }}
-                  />
-                )}
-                label="Owner Only"
-              />
-              </>
-
-            )}
             {currentLoggedInUser && (
               <>
               <Autocomplete
